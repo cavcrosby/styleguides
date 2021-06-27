@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="img/favicon.ico">
+        <title>Shell Style Guide - Styleguides</title>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/font-awesome.min.css" rel="stylesheet">
+        <link href="css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/styles/stackoverflow-light.min.css">
+        <link href="css/extra.css" rel="stylesheet">
+
+        <script src="js/jquery-1.10.2.min.js" defer></script>
+        <script src="js/bootstrap.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.5.0/languages/bash.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">Styleguides</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="navitem">
+                                <a href="index.html" class="nav-link">Home</a>
+                            </li>
+                            <li class="dropdown active">
+                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Code Style Guides <b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="shellguide.html" class="dropdown-item active">Shell Style Guide</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                            <li class="nav-item">
+                                <a rel="prev" href="index.html" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" class="nav-link disabled">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-light navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-secondary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-level="1"><a href="#shell-style-guide" class="nav-link">Shell Style Guide</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-level="2"><a href="#table-of-contents" class="nav-link">Table of Contents</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#background" class="nav-link">Background</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#shell-files-and-interpreter-invocation" class="nav-link">Shell Files and Interpreter Invocation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#environment" class="nav-link">Environment</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#comments" class="nav-link">Comments</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#comment-tags" class="nav-link">Comment Tags</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#formatting" class="nav-link">Formatting</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#features-and-bugs" class="nav-link">Features and Bugs</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#naming-conventions" class="nav-link">Naming Conventions</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#calling-commands" class="nav-link">Calling Commands</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-level="2"><a href="#conclusion" class="nav-link">Conclusion</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="shell-style-guide">Shell Style Guide</h1>
+<h2 id="table-of-contents">Table of Contents</h2>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#s1-background">Background</a></td>
+<td><a href="#s1.1-which-shell-to-use">Which Shell to Use</a> - <a href="#s1.2-when-to-use-shell">When to use Shell</a></td>
+</tr>
+<tr>
+<td><a href="#s2-shell-files-and-interpreter-invocation">Shell Files and Interpreter Invocation</a></td>
+<td><a href="#s2.1-file-extensions">File Extensions</a> - <a href="#s2.2-suid-sgid">SUID/SGID</a></td>
+</tr>
+<tr>
+<td><a href="#s3-environment">Environment</a></td>
+<td><a href="#s3.1-stdout-vs-stderr">STDOUT vs STDERR</a></td>
+</tr>
+<tr>
+<td><a href="#s4-comments">Comments</a></td>
+<td><a href="#s4.1-file-header">File Header</a> - <a href="#s4.2-function-comments">Function Comments</a> - <a href="#s4.3-implementation-comments">Implementation Comments</a></td>
+</tr>
+<tr>
+<td><a href="#s5-comment-tags">Comment Tags</a></td>
+<td><a href="#s5.1-todo-tags">TODO Comments</a> - <a href="#s5.2-note-tags">NOTE Comments</a> - <a href="#s5.3-notes-tags">NOTES Comments</a> - <a href="#s5.4-discuss-tags">DISCUSS Comments</a></td>
+</tr>
+<tr>
+<td><a href="#s6-formatting">Formatting</a></td>
+<td><a href="#s6.1-indentation">Indentation</a> - <a href="#s6.2-line-length-and-long-strings">Line Length and Long Strings</a> - <a href="#s6.3-pipelines">Pipelines</a> - <a href="#s6.4-loops">Loops</a> - <a href="#s6.5-case-statement">Case statement</a> - <a href="#s6.6-variable-expansion">Variable expansion</a> - <a href="#s6.7-quoting">Quoting</a> - <a href="#s6.8-cli">CLI</a></td>
+</tr>
+<tr>
+<td><a href="#s7-features-and-bugs">Features and Bugs</a></td>
+<td><a href="#s7.1-shellcheck">ShellCheck</a> - <a href="#s7.2-command-substitution">Command Substitution</a> - <a href="#s7.3-tests">Test, [… ], and [[… ]]</a> - <a href="#s7.4-testing-strings">Testing Strings</a> - <a href="#s7.5-wildcard-expansion-of-filenames">Wildcard Expansion of Filenames</a> - <a href="#s7.6-eval">Eval</a> - <a href="#s7.7-arrays">Arrays</a> - <a href="#s7.8-pipes-to-while">Pipes to While</a> - <a href="#s7.9-arithmetic">Arithmetic</a></td>
+</tr>
+<tr>
+<td><a href="#s8-naming-conventions">Naming Conventions</a></td>
+<td><a href="#s8.1-function-names">Function Names</a> - <a href="#s8.2-variable-names">Variable Names</a> - <a href="#s8.3-constants-and-environment-variable-names">Constants and Environment Variable Names</a> - <a href="#s8.4-source-filenames">Source Filenames</a> - <a href="#s8.5-read-only-variables">Read-only Variables</a> - <a href="#s8.6-use-local-variables">Use Local Variables</a> - <a href="#s8.7-function-location">Function Location</a> - <a href="#s8.8-main">main</a></td>
+</tr>
+<tr>
+<td><a href="#s9-calling-commands">Calling Commands</a></td>
+<td><a href="#s9.1-checking-return-values">Checking Return Values</a> - <a href="#s9.2-builtin-commands-vs-external-commands">Builtin Commands vs. External Commands</a> - <a href="#s9.3-long-options-over-short-options">Long Options Over Short Options</a> - <a href="#s9.4-dependency-checking">Dependency Checking</a></td>
+</tr>
+<tr>
+<td><a href="#s10-conclusion">Conclusion</a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><a id="s1-background"></a></p>
+<h2 id="background">Background</h2>
+<p><a id="s1.1-which-shell-to-use"></a></p>
+<h3 id="which-shell-to-use">Which Shell to Use</h3>
+<p><strong><code>Bash</code></strong> should be used for executables if the following criteria is desired:</p>
+<ul>
+<li>portability across different systems are of a concern (vs. shells like fish, zsh)</li>
+<li>I want potentially substantial gains in readability over plain vanilla <strong><code>sh</code></strong></li>
+<li>I have a need for particular feature of the bash shell (e.g. arrays)</li>
+</ul>
+<p>If wanting to stick closer to <strong>POSIX</strong> compliance (can ensure a bit more
+portability) then vanilla <code>sh</code> should be used (or some variant that is
+closer to POSIX compliance). Even if executables are written to target
+bash, features specific to bash (<a href="https://mywiki.wooledge.org/Bashism">bashisms</a>) should
+be kept to a minimum. By following this, in theory, shell code written to
+target bash should not need major reworking to work for a different shell.</p>
+<p>Going forward, any context that uses <code>bash</code> can be replaced with <code>sh</code>.
+At least mostly, as bash specific features obviously won't work with sh
+(e.g. arrays).</p>
+<p>The only exception for using a particular shell is where I am forced to
+by whatever I am coding for. One example of this is Solaris SVR4
+packages which require plain Bourne shell (<code>sh</code>) for any scripts.</p>
+<p><a id="s1.2-when-to-use-shell"></a></p>
+<h3 id="when-to-use-shell">When to use Shell</h3>
+<p>Ideally, the Shell should only be used
+for simple utilities or simple wrapper scripts. </p>
+<p>While shell scripting isn't a development language, it is used for
+writing various utility scripts throughout Google. This style guide
+is more a recognition of its use rather than a suggestion that it be
+used for widespread deployment.</p>
+<p>Some guidelines:</p>
+<ul>
+<li>If I am mostly calling other utilities and are doing relatively
+    little data manipulation, shell is an acceptable choice for the task.</li>
+<li>If performance matters, use something other than shell.</li>
+<li>If I am writing a script that is more than 100 lines long, or
+    that uses non-straightforward control flow logic, I should
+    rewrite it in a more structured language <em>now</em>. Bear in
+    mind that scripts grow. Rewrite the script early to avoid a more
+    time-consuming rewrite at a later date.</li>
+<li>When assessing the complexity of the shell code (e.g. to decide whether
+    to switch languages) consider whether the code is easily
+    maintainable by people other than me.</li>
+</ul>
+<p><a id="s2-shell-files-and-interpreter-invocation"></a></p>
+<h2 id="shell-files-and-interpreter-invocation">Shell Files and Interpreter Invocation</h2>
+<p><a id="s2.1-file-extensions"></a></p>
+<h3 id="file-extensions">File Extensions</h3>
+<p>Executables must start with <strong><code>#!/bin/bash</code></strong>(known as the shabang line)
+and a minimum number of flags. Use <code>set</code> to set shell options so that
+calling my script as <code>bash script_name</code> does not break its functionality.
+If the file is a library, then no shabang line is needed to be added.</p>
+<p>Executables should have no extension (<strong><em>strongly</em></strong> preferred) or a
+<code>.sh</code> extension. Libraries must have a <code>.sh</code>
+extension and should not be executable.</p>
+<p>It is not necessary to know what language a program is written in when
+executing it and shell doesn't require an extension so I prefer not
+to use one for executables.</p>
+<p>However, for libraries it's important to know what language it is and
+sometimes there's a need to have similar libraries in different
+languages. This allows library files with identical purposes but
+different languages to be identically named except for the
+language-specific suffix.</p>
+<p><a id="s2.2-suid-sgid"></a></p>
+<h3 id="suidsgid">SUID/SGID</h3>
+<p>SUID and SGID are <em>forbidden</em> on shell scripts.</p>
+<p>There are too many security issues with shell that make it nearly
+impossible to secure sufficiently to allow SUID/SGID. While bash does
+make it difficult to run SUID, it's still possible on some platforms
+which is why I am being explicit about banning it.</p>
+<p>Use <code>sudo</code> to provide elevated access if I need it.</p>
+<p><a id="s3-environment"></a></p>
+<h2 id="environment">Environment</h2>
+<p><a id="s3.1-stdout-vs-stderr"></a></p>
+<h3 id="stdout-vs-stderr">STDOUT vs STDERR</h3>
+<p>All error messages should go to <code>STDERR</code>.</p>
+<p>This makes it easier to separate normal status from actual issues.</p>
+<p>Currently while my <strong>dotfiles</strong> do include ANSI escape color sequences for
+status messages, unless the project the shell code is in also includes
+the ANSI escape color sequences, it is advised to use the following below
+as the format for messages to stderr.</p>
+<pre><code class="language-bash">if [ -z &quot;$(command -v git)&quot; ]; then
+    echo &quot;${PROGRAM_NAME}: git cannot be found in the PATH!&quot; &gt;&amp;2
+    exit 1
+fi
+</code></pre>
+<p><a id="s4-comments"></a></p>
+<h2 id="comments">Comments</h2>
+<p><a id="s4.1-file-header"></a></p>
+<h3 id="file-header">File Header</h3>
+<p>Start each file with a description of its contents.</p>
+<p>Every file must have a top-level comment including a brief overview of
+its contents. *.conf, *.cfg, *.env (or any other named variant, e.g.
+*.test_env) files should also contain this header, just without the
+shabang line.</p>
+<p>Example:</p>
+<pre><code class="language-bash">#!/bin/bash
+#
+# Perform hot backups of Oracle databases.
+</code></pre>
+<p><a id="s4.2-function-comments"></a></p>
+<h3 id="function-comments">Function Comments</h3>
+<p>All shell functions must be commented.</p>
+<p>It should be possible for someone else to learn how to use my
+program or to use a function in my library by reading the comments
+(and self-help, if provided) without reading the code.</p>
+<p>All function comments should describe the intended API behaviour using (and in this order):</p>
+<ul>
+<li>Description of the function.</li>
+<li>Globals: List of global variables used and/or modified. (default if not listed, <strong>None</strong>)</li>
+<li>Arguments: Arguments taken. (default if not listed, <strong>None</strong>)</li>
+<li>Outputs: Output to STDOUT or STDERR. (default if not listed, <strong>None</strong>)</li>
+<li>Returns: Returned values other than the exit/return code of commands.<ul>
+<li>Even if there is a slight chance that a command might return the exit
+    code of a hardcoded exit code, I can assume it should mostly be the hardcoded
+    status code that is returned.</li>
+</ul>
+</li>
+</ul>
+<p>If a function also serves a CLI, then the CLI options should also be
+account for in the 'Arguments' section of a function.</p>
+<p>Examples:</p>
+<pre><code class="language-bash">#######################################
+# Cleanup files from the backup directory.
+# Globals:
+#   BACKUP_DIR
+#   ORACLE_SID
+#######################################
+cleanup() {
+    …
+}
+
+#######################################
+# Get configuration directory.
+# Globals:
+#   SOMEDIR
+# Outputs:
+#   - Writes location to stdout
+#######################################
+get_dir() {
+    echo &quot;${SOMEDIR}&quot;
+}
+
+#######################################
+# Gets a file based on the url.
+# Globals:
+#   PROGRAM_NAME
+# Outputs:
+#   - Command errors to stderr (e.g. wget &quot;$1&quot;)
+#   - Custom errors to stderr (e.g. echo &quot;${PROGRAM_NAME}:...&quot;)
+# Returns:
+#   - 0: success
+#   - 1: wget is not in the path
+#######################################
+get_file() {
+    if [ -z &quot;$(command -v wget)&quot; ]; then
+        echo &quot;${PROGRAM_NAME}: wget cannot be found in the PATH!&quot; &gt;&amp;2
+        return 1
+    wget &quot;$1&quot;
+    return # should return exit status of wget
+}
+
+#######################################
+# Removes a file, echos a file, and creates
+# numerous files.
+# Arguments:
+#   $1: A file path to delete.
+#   $2: A file path to echo.
+#   $n: File names to create.
+#######################################
+do_things() {
+    rm &quot;$1&quot;; shift
+    echo &quot;$1&quot;; shift
+    while [ $# -gt 0 ]; do
+        touch &quot;$1&quot;
+        shift
+    done
+}
+
+#######################################
+# Removes a file from the system.
+# Arguments:
+#   -h/--help: show help message and exit.
+#   $1: A file path to delete.
+#######################################
+del_thing() {
+    # constants and defined cli parameters, opt ==&gt; option
+    readonly PROGRAM_NAME=&quot;del_thing&quot;
+    readonly HELP_SHORT_OPT=&quot;h&quot;
+    readonly HELP_LONG_OPT=&quot;help&quot;
+
+    short_opts=&quot;${HELP_SHORT_OPT}&quot;
+    path_prefix=&quot;/&quot;
+    help_option=false
+    # do not combine long opts into their own variable
+    eval set -- &quot;$(getopt --options &quot;${short_opts}&quot; --long &quot;${HELP_LONG_OPT}&quot; --name &quot;${PROGRAM_NAME}&quot; -- &quot;$@&quot;)&quot;
+    …
+}
+</code></pre>
+<p><a id="s4.3-implementation-comments"></a></p>
+<h3 id="implementation-comments">Implementation Comments</h3>
+<p>Comment tricky, non-obvious, interesting or important parts of the
+code.</p>
+<p>This follows general Google coding comment practice. Don't comment
+everything. If there's a complex algorithm or you're doing something
+out of the ordinary, put a short comment in.</p>
+<p><a id="s5-comment-tags"></a></p>
+<h2 id="comment-tags">Comment Tags</h2>
+<p>Below are the formats for comment tags that should be used throughout the
+shell code. All tags should have their respective name in all caps, followed
+by the name <strong><em><code>cavcrosby</code></em></strong>. The main purpose of this is to have consistent
+comment tags across my shell code that can be searched.</p>
+<p><a id="s5.1-todo-tags"></a></p>
+<h3 id="todo-tags">TODO Tags</h3>
+<p>Use <code>TODO</code> tags/comments for code that is temporary, a short-term solution, or
+good-enough but not perfect. A <code>TODO</code> is not a commitment that the I will
+fix the problem. At least not immediately.</p>
+<p>Examples:</p>
+<pre><code class="language-bash"># TODO(cavcrosby): need to implement new option to allow easier convenience
+</code></pre>
+<p><a id="s5.2-note-tags"></a></p>
+<h3 id="note-tags">NOTE Tags</h3>
+<p><code>NOTE</code> tags/comments be used to denote comments that should gartner a bit
+more attention than a typical code comment. NOTE comment should be less
+than 2 sentences and does not end with a period. The first word in a NOTE
+comment (after NOTE:) does not have its first letter capitalized.</p>
+<p>Examples:</p>
+<pre><code class="language-bash"># NOTE(cavcrosby): currently used because foo is not available on all systems
+</code></pre>
+<p><a id="s5.3-notes-tags"></a></p>
+<h3 id="notes-tags">NOTES Tags</h3>
+<p><code>NOTES</code> tags/comments are the same as <code>NOTE</code> comments, but are at least 2 sentences.
+They may be used more to elaborate about the reasoning behind the
+implementation of the code that they are next to. That said, they shouldn't
+be of great lengths. At the moment the max is roughly 5 sentences.</p>
+<p>Examples:</p>
+<pre><code class="language-bash"># NOTES(cavcrosby): currently used because foo is not available on all systems.
+# For now bar will be used in foo's place.
+</code></pre>
+<p><a id="s5.4-discuss-tags"></a></p>
+<h3 id="discuss-tags">DISCUSS Tags</h3>
+<p><code>DISCUSS</code> tags/comments are reversed for areas in code that still need
+to be thought out/researched before implementation or there may be code
+that needs to be discussed in about its implementation. Typically these
+are areas that have greater impact than TODO comments because they could 
+affect multiple repos.</p>
+<p>Examples:</p>
+<pre><code class="language-bash"># DISCUSS(cavcrosby): the variable names throughout are clunky. Could this be improved
+# aboard? Can there at least be consistency in this repo?
+</code></pre>
+<p><a id="s6-formatting"></a></p>
+<h2 id="formatting">Formatting</h2>
+<p>While I should follow the style that's already there for files that
+I am modifying, the following are required for any new code I write or
+for files that are own by me.</p>
+<p><a id="s6.1-indentation"></a></p>
+<h3 id="indentation">Indentation</h3>
+<p>Indent <strong>4</strong> spaces. No tabs.</p>
+<p>Use blank lines between blocks to improve readability. Indentation is
+four spaces.</p>
+<p><a id="s6.2-line-length-and-long-strings"></a></p>
+<h3 id="line-length-and-long-strings">Line Length and Long Strings</h3>
+<p>Maximum line length is 70ish characters (Google states their strings stop
+at 80 max). This is to stay consistent with Python code (PEP 8 compliant
+anyways) I write.</p>
+<p>If I have to write strings that are a lot longer than 70ish characters, this
+should be done with a here document or an embedded newline if possible.
+Literal strings that have to be a lot longer than 70ish characters and
+can't sensibly be split are ok, but it's strongly preferred to find a
+way to make it shorter.</p>
+<pre><code class="language-bash"># DO use 'here document's
+cat &lt;&lt;END
+I am an exceptionally long
+string.
+END
+
+# Embedded newlines are ok too
+long_string=&quot;I am an exceptionally
+long string.&quot;
+</code></pre>
+<p><a id="s6.3-pipelines"></a></p>
+<h3 id="pipelines">Pipelines</h3>
+<p>Pipelines should be split one per line if they don't all fit on one
+line.</p>
+<p>If a pipeline all fits on one line, it should be on one line.</p>
+<p>If not, it should be split at one pipe segment per line with the pipe
+on the newline and a 4 space indent for the next section of the pipe.
+This applies to a chain of commands combined using <code>|</code> as well as to
+logical control operators <code>||</code> and <code>&amp;&amp;</code>.</p>
+<pre><code class="language-bash"># All fits on one line
+command1 | command2
+
+# Long commands
+command1 \
+    | command2 \
+    | command3 \
+    | command4
+</code></pre>
+<p><a id="s6.4-loops"></a></p>
+<h3 id="loops">Loops</h3>
+<p>Put <code>; do</code> and <code>; then</code> on the same line as the
+<code>while</code>, <code>for</code> or <code>if</code>.</p>
+<p>Loops in shell are a bit different, but I should follow the same principles
+as with braces when declaring functions. That is: <code>; then</code>
+and <code>; do</code> should be on the same line as the if/for/while.
+<code>else</code> should be on its own line and closing statements
+should be on their own line vertically aligned with the opening
+statement.</p>
+<p>Example:</p>
+<pre><code class="language-bash"># If inside a function, consider declaring the loop variable as
+# a local to avoid it leaking into the global environment:
+# local dir
+for dir in &quot;${dirs_to_cleanup[@]}&quot;; do
+    if [ -d &quot;${dir}/${ORACLE_SID}&quot; ]; then
+        log_date &quot;Cleaning up old files in ${dir}/${ORACLE_SID}&quot;
+        rm &quot;${dir}/${ORACLE_SID}/&quot;*
+        if (( $? != 0 )); then
+            error_message
+        fi
+    else
+        mkdir -p &quot;${dir}/${ORACLE_SID}&quot;
+        if (( $? != 0 )); then
+            error_message
+        fi
+    fi
+done
+</code></pre>
+<p><a id="s6.5-case-statement"></a></p>
+<h3 id="case-statement">Case statement</h3>
+<ul>
+<li>Indent alternatives by 4 spaces.</li>
+<li>A one-line alternative needs a space after the close parenthesis of
+    the pattern and before the <code>;;</code>.</li>
+<li>Long or multi-command alternatives should be split over multiple
+    lines with the pattern, actions, and <code>;;</code> on separate
+    lines.</li>
+</ul>
+<p>The matching expressions are indented one level from the <code>case</code> and <code>esac</code>.
+Multiline actions are indented another level. In general, there is no need to
+quote match expressions. Pattern expressions should not be preceded by an open
+parenthesis. Avoid the <code>;&amp;</code> and <code>;;&amp;</code> notations, a bash feature to the case
+statement.</p>
+<pre><code class="language-bash">case &quot;${expression}&quot; in
+    a)
+        variable=&quot;…&quot;
+        some_command &quot;${variable}&quot; &quot;${other_expr}&quot; …
+        ;;
+    absolute)
+        actions=&quot;relative&quot;
+        another_command &quot;${actions}&quot; &quot;${other_expr}&quot; …
+        ;;
+    *)
+        error &quot;Unexpected expression '${expression}'&quot;
+        ;;
+esac
+</code></pre>
+<p>Simple commands may be put on the same line as the pattern <i>and</i>
+<code>;;</code> as long as the expression remains readable. This is
+often appropriate for option processing. When the
+actions don't fit on a single line, put the pattern on a line on its
+own, then the actions, then <code>;;</code> also on a line of its own.
+When on the same line as the actions, use a space after the close
+parenthesis of the pattern and another before the <code>;;</code>.</p>
+<pre><code class="language-bash"># short option processing
+verbose='false'
+aflag=''
+bflag=''
+files=''
+while getopts 'abf:v' flag; do
+    case &quot;${flag}&quot; in
+        a) aflag='true' ;;
+        b) bflag='true' ;;
+        f) files=&quot;${OPTARG}&quot; ;;
+        v) verbose='true' ;;
+        *) error &quot;Unexpected option ${flag}&quot; ;;
+    esac
+done
+</code></pre>
+<pre><code class="language-bash"># short/long option processing
+# constants and defined cli parameters, opt ==&gt; option
+readonly PROGRAM_NAME=&quot;foo&quot;
+readonly HELP_SHORT_OPT=&quot;h&quot;
+readonly HELP_LONG_OPT=&quot;help&quot;
+
+short_opts=&quot;${HELP_SHORT_OPT}&quot;
+path_prefix=&quot;/&quot;
+help_option=false
+# do not combine long opts into their own variable
+eval set -- &quot;$(getopt --options &quot;${short_opts}&quot; --long &quot;${HELP_LONG_OPT}&quot; --name &quot;${PROGRAM_NAME}&quot; -- &quot;$@&quot;)&quot;
+while true; do
+    case &quot;$1&quot; in
+        &quot;-${HELP_SHORT_OPT}&quot; | &quot;--${HELP_LONG_OPT}&quot;)                        help_option=true; shift ;;
+        &quot;-${RELATIVE_PATH_SHORT_OPT}&quot; | &quot;--${RELATIVE_PATH_LONG_OPT}&quot;)      path_prefix=&quot;./&quot;; shift ;;
+        &quot;--&quot;)                                                               shift; break ;;
+        *)                                                                  break ;;
+    esac
+done
+…
+</code></pre>
+<p><a id="s6.6-variable-expansion"></a></p>
+<h3 id="variable-expansion">Variable expansion</h3>
+<p>In order of precedence: Stay consistent with what I find; quote
+variables; prefer <code>"${var}"</code> over <code>"$var"</code>.</p>
+<p>These are strongly recommended guidelines but not mandatory
+regulation. Nonetheless, the fact that it's a recommendation and
+not mandatory doesn't mean it should be taken lightly or downplayed.</p>
+<p>They are listed in order of precedence.</p>
+<ul>
+<li>Stay consistent with what I find for existing code (that isn't mine anyways).</li>
+<li>Quote variables, see <a href="#quoting">Quoting section below</a>.</li>
+<li>Don't brace-delimit single character shell specials / positional parameters, unless strictly necessary or avoiding deep confusion.</li>
+</ul>
+<p>Prefer brace-delimiting all other variables.</p>
+<pre><code class="language-bash"># Section of *recommended* cases.
+
+# Preferred style for 'special' variables:
+echo &quot;Positional: $1&quot; &quot;$5&quot; &quot;$3&quot;
+echo &quot;Specials: !=$!, -=$-, _=$_. ?=$?, #=$# *=$* @=$@ \$=$$ …&quot;
+
+# Braces necessary:
+echo &quot;many parameters: ${10}&quot;
+
+# Braces avoiding confusion:
+# Output is &quot;a0b0c0&quot;
+set -- a b c
+echo &quot;${1}0${2}0${3}0&quot;
+
+# Preferred style for other variables:
+echo &quot;PATH=${PATH}, PWD=${PWD}, mine=${some_var}&quot;
+while read -r f; do
+    echo &quot;file=${f}&quot;
+done &lt; &lt;(find /tmp)
+</code></pre>
+<pre><code class="language-bash"># Section of *discouraged* cases
+
+# Unquoted vars, unbraced vars, brace-delimited single letter
+# shell specials.
+echo a=$avar &quot;b=$bvar&quot; &quot;PID=${$}&quot; &quot;${1}&quot;
+
+# Confusing use: this is expanded as &quot;${1}0${2}0${3}0&quot;,
+# not &quot;${10}${20}${30}
+set -- a b c
+echo &quot;$10$20$30&quot;
+</code></pre>
+<p>NOTE: Using braces in <code>${var}</code> is <em>not</em> a form of quoting. "Double quotes" must
+be used <em>as well</em>.</p>
+<p><a id="s6.7-quoting"></a></p>
+<h3 id="quoting">Quoting</h3>
+<ul>
+<li>Always quote strings containing variables, command substitutions, spaces or
+    shell meta characters, unless careful unquoted expansion is required or it's
+    a shell-internal integer (see next point).</li>
+<li>Use arrays for safe quoting of lists of elements, especially command-line
+    flags. See <a href="#arrays">Arrays</a> below.</li>
+<li>Optionally quote shell-internal, readonly special variables that are defined
+    to be integers: <code>$?</code>, <code>$#</code>, <code>$$</code>, <code>$!</code> (man bash). Prefer quoting of "named"
+    internal integer variables, e.g. PPID etc for consistency.</li>
+<li>Prefer quoting strings that are "words" (as opposed to command options or
+    path names).</li>
+<li>Never quote <em>literal</em> integers.</li>
+<li>Be aware of the quoting rules for pattern matches in <code>[[ … ]]</code>. See the
+    <a href="#tests">Test, <code>[ … ]</code>, and <code>[[ … ]]</code></a> section below.</li>
+<li>Use <code>"$@"</code> unless I have a specific reason to use <code>$*</code>, such as simply
+    appending the arguments to a string in a message or log.</li>
+</ul>
+<pre><code class="language-bash"># 'Single' quotes indicate that no substitution is desired.
+# &quot;Double&quot; quotes indicate that substitution is required/tolerated.
+
+# Simple examples
+
+# &quot;quote command substitutions&quot;
+# Note that quotes nested inside &quot;$()&quot; don't need escaping.
+flag=&quot;$(some_command and its args &quot;$@&quot; 'quoted separately')&quot;
+
+# &quot;quote variables&quot;
+echo &quot;${flag}&quot;
+
+# Use arrays with quoted expansion for lists.
+declare -a FLAGS
+FLAGS=( --foo --bar='baz' )
+readonly FLAGS
+mybinary &quot;${FLAGS[@]}&quot;
+
+# It's ok to not quote internal integer variables.
+if (( $# &gt; 3 )); then
+  echo &quot;ppid=${PPID}&quot;
+fi
+
+# &quot;never quote literal integers&quot;
+value=32
+# &quot;quote command substitutions&quot;, even when I expect integers
+number=&quot;$(generate_number)&quot;
+
+# &quot;prefer quoting words&quot;, not compulsory
+readonly USE_INTEGER='yes'
+
+# &quot;quote shell meta characters&quot;
+echo 'Hello stranger, and well met. Earn lots of $$$'
+echo &quot;Process $$: Done making \$\$\$.&quot;
+
+# &quot;command options or path names&quot;
+# ($1 is assumed to contain a value here)
+grep -li Hugo /dev/null &quot;$1&quot;
+
+# Less simple examples
+# &quot;quote variables, unless proven false&quot;: ccs might be empty
+# from the bash man page, on ${parameter:+word}:
+# &quot;If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted.&quot;
+
+git send-email --to &quot;${reviewers}&quot; ${ccs:+&quot;--cc&quot; &quot;${ccs}&quot;}
+
+# Positional parameter precautions: $1 might be unset
+# Single quotes leave regex as-is.
+grep -cP '([Ss]pecial|\|?characters*)$' ${1:+&quot;$1&quot;}
+
+# For passing on arguments,
+# &quot;$@&quot; is right almost every time, and
+# $* is wrong almost every time:
+#
+# * $* and $@ will split on spaces, clobbering up arguments
+#   that contain spaces and dropping empty strings;
+# * &quot;$@&quot; will retain arguments as-is, so no args
+#   provided will result in no args being passed on;
+#   This is in most cases what I want to use for passing
+#   on arguments.
+# * &quot;$*&quot; expands to one argument, with all args joined
+#   by (usually) spaces,
+#   so no args provided will result in one empty string
+#   being passed on.
+# (Consult `man bash` for the nit-grits ;-)
+
+(set -- 1 &quot;2 two&quot; &quot;3 three tres&quot;; echo $#; set -- &quot;$*&quot;; echo &quot;$#, $@&quot;)
+(set -- 1 &quot;2 two&quot; &quot;3 three tres&quot;; echo $#; set -- &quot;$@&quot;; echo &quot;$#, $@&quot;)
+</code></pre>
+<p><a id="s6.8-cli"></a></p>
+<h3 id="cli-command-line-interface">CLI (Command Line Interface)</h3>
+<p>Any shell script should have a <strong><em>fully functional</em></strong> command line interface
+readily available. Shell functions are not expected to have a <strong><em>fully functional</em></strong>
+command line interface, unless this shell function happens to be the
+'main' of the script. In this case, <code>-h</code> and <code>--help</code> should be implemented
+but not shown as part of the usage string.</p>
+<p>I prefer having command line interfaces created with both long and
+short options available. <code>getops</code> only supports short options while as
+<code>getopt</code> supports both. So when given the choice use getopt, and if for
+some reason getopt is not available then getopts will work in a pinch
+(<a href="https://stackoverflow.com/questions/402377/using-getopts-to-process-long-and-short-command-line-options">reference</a>).</p>
+<p>Example (getopt/getops examples already exist in the document):</p>
+<pre><code class="language-bash"># NOTE(cavcrosby): this is to encourage the notion that this will not have a fully
+# functional CLI (e.g. ./PROGRAM_NAME -f foo -b bar)
+if [ &quot;$1&quot; = &quot;-h&quot; ] || [ &quot;$1&quot; = &quot;--help&quot; ]; then
+    cat &lt;&lt; _EOF_
+Usage: ${PROGRAM_NAME}
+
+This program goes foo. This program does not plan on having a functional
+command line interface (CLI).
+
+_EOF_
+    exit 0
+</code></pre>
+<p><a id="s7-features-and-bugs"></a></p>
+<h2 id="features-and-bugs">Features and Bugs</h2>
+<p><a id="s7.1-shellcheck"></a></p>
+<h3 id="shellcheck">ShellCheck</h3>
+<p>The <a href="https://www.shellcheck.net/">ShellCheck project</a> identifies common bugs and
+warnings for shell scripts. It is recommended for all scripts, large or
+small.</p>
+<p><a id="s7.2-command-substitution"></a></p>
+<h3 id="command-substitution">Command Substitution</h3>
+<p>Use <code>$(command)</code> instead of backticks.</p>
+<p>Nested backticks require escaping the inner ones with <code>\</code>.
+The <code>$(command)</code> format doesn't change when nested and is
+easier to read.</p>
+<p>Example:</p>
+<pre><code class="language-bash"># This is preferred:
+var=&quot;$(command &quot;$(command1)&quot;)&quot;
+</code></pre>
+<pre><code class="language-bash"># This is not:
+var=&quot;`command \`command1\``&quot;
+</code></pre>
+<p><a id="s7.3-tests"></a></p>
+<p><a id="tests"></a></p>
+<h3 id="test-and">Test, <code>[ … ]</code>, and <code>[[ … ]]</code></h3>
+<p><code>[ … ]</code> is preferred over <code>[[ … ]]</code>, (don't use <code>test</code> or full path <code>/usr/bin/[</code>).
+This is in contrast to Google's opinion. Though, this isn't to say this
+is a wisest choice, but I wish to keep things generic and use the shell
+how I believe it was intended to be used.</p>
+<p>Anything between <code>[ … ]</code> should already be checked and prevented from
+performing globbing (path name expansion) or field/word splitting. Neither
+of these shell features should be desired when using <code>[ … ]</code>.</p>
+<p>Regular expression matching can be made up by using grep.</p>
+<pre><code class="language-bash"># This ensures the string on the left is made up of characters in
+# the alnum character class followed by the string name.
+if [ &quot;$(echo &quot;filename&quot; | grep --extended-regexp '^[[:alnum:]]+name' --count)&quot; -gt 0 ]; then
+    echo &quot;Match&quot;
+fi
+
+# This matches the exact pattern &quot;f*&quot; (Does not match in this case)
+# ...to be fair this is harder to read
+if [ &quot;$(echo &quot;filename&quot; | grep --extended-regexp '\&quot;f*\&quot;' --count)&quot; -gt 0 ]; then
+  echo &quot;Match&quot;
+fi
+</code></pre>
+<pre><code class="language-bash"># This gives a &quot;too many arguments&quot; error as f* is expanded to the
+# contents of the current directory
+if [ &quot;filename&quot; == f* ]; then
+  echo &quot;Match&quot;
+fi
+</code></pre>
+<p>For the gory details, see E14 at http://tiswww.case.edu/php/chet/bash/FAQ</p>
+<p><a id="s7.4-testing-strings"></a></p>
+<h3 id="testing-strings">Testing Strings</h3>
+<p>Use quotes rather than filler characters where possible.</p>
+<p>Bash is smart enough to deal with an empty string in a test. So, given
+that the code is much easier to read, use tests for empty/non-empty
+strings or empty strings rather than filler characters.</p>
+<pre><code class="language-bash"># Do this:
+if [ &quot;${my_var}&quot; = &quot;some_string&quot; ]; then
+    do_something
+fi
+
+# -z (string length is zero) and -n (string length is not zero) are
+# preferred over testing for an empty string
+if [ -z &quot;${my_var}&quot; ]; then
+    do_something
+fi
+
+</code></pre>
+<pre><code class="language-bash"># Not this:
+if [[ &quot;${my_var}X&quot; == &quot;some_stringX&quot; ]]; then
+    do_something
+fi
+</code></pre>
+<p>To avoid confusion about what is being tested for, explicitly use
+<code>-z</code> or <code>-n</code>.</p>
+<pre><code class="language-bash"># Use this
+if [ -n &quot;${my_var}&quot; ]; then
+    do_something
+fi
+</code></pre>
+<pre><code class="language-bash"># Instead of this
+if [ &quot;${my_var}&quot; ]; then
+    do_something
+fi
+</code></pre>
+<p>While <code>==</code> is easier to read, '=' is the preferred operator for equality.
+Despite the fact '=' is also an assignment operator elsewhere.
+However, be careful when using <code>&lt;</code> and <code>&gt;</code>
+in <code>[[ … ]]</code> which performs a lexicographical comparison.
+Use <code>(( … ))</code> or <code>-lt</code> and <code>-gt</code> for
+numerical comparison.</p>
+<pre><code class="language-bash"># Use this
+if [ &quot;${my_var}&quot; = &quot;val&quot; ]; then
+    do_something
+fi
+
+if (( my_var &gt; 3 )); then
+    do_something
+fi
+
+if [ &quot;${my_var}&quot; -gt 3 ]; then
+    do_something
+fi
+</code></pre>
+<pre><code class="language-bash"># Probably unintended lexicographical comparison.
+if [ &quot;${my_var}&quot; &gt; 3 ]; then
+    # True for 4, false for 22.
+    do_something
+fi
+</code></pre>
+<p><a id="s7.5-wildcard-expansion-of-filenames"></a></p>
+<h3 id="wildcard-expansion-of-filenames">Wildcard Expansion of Filenames</h3>
+<p>Use an explicit path when doing wildcard expansion of filenames.</p>
+<p>As filenames can begin with a <code>-</code>, it's a lot safer to
+expand wildcards with <code>./*</code> instead of <code>*</code>.</p>
+<pre><code class="language-bash"># Here's the contents of the directory:
+# -f  -r  somedir  somefile
+
+# Incorrectly deletes almost everything in the directory by force
+psa@bilby$ rm -v *
+removed directory: `somedir'
+removed `somefile'
+</code></pre>
+<pre><code class="language-bash"># As opposed to:
+psa@bilby$ rm -v ./*
+removed `./-f'
+removed `./-r'
+rm: cannot remove `./somedir': Is a directory
+removed `./somefile'
+</code></pre>
+<p><a id="s7.6-eval"></a></p>
+<h3 id="eval">Eval</h3>
+<p><code>eval</code> should be use sparingly, even more so if user input is involved.
+There might be more reasons as to not use eval but I did not have use
+cases that matched why Google declared that eval should not be used for
+...I think.</p>
+<p>For now it seems to be ok when evaluating CLI options from getopt.</p>
+<pre><code class="language-bash"># What does this set?
+# Did it succeed? In part or whole?
+eval $(set_my_variables)
+
+# What happens if one of the returned values has a space in it?
+variable=&quot;$(eval some_function)&quot;
+</code></pre>
+<p><a id="s7.7-arrays"></a></p>
+<h3 id="arrays">Arrays</h3>
+<p>Bash arrays should be used to store lists of elements, to avoid quoting
+complications. This particularly applies to argument lists. Arrays
+should not be used to facilitate more complex data structures (see
+<a href="#when-to-use-shell">When to use Shell</a> above).</p>
+<p>Arrays store an ordered collection of strings, and can be safely
+expanded into individual elements for a command or loop.</p>
+<p>Using a single string for multiple command arguments should be avoided
+at least where possible, as it inevitably leads to myself to using <code>eval</code>
+or trying to nest quotes inside the string, which does not give
+reliable or readable results and leads to needless complexity.</p>
+<pre><code class="language-bash"># An array is assigned using parentheses, and can be appended to
+# with +=( … ).
+declare -a flags
+flags=(--foo --bar='baz')
+flags+=(--greeting=&quot;Hello ${name}&quot;)
+mybinary &quot;${flags[@]}&quot;
+</code></pre>
+<pre><code class="language-bash"># Don’t use strings for sequences.
+flags='--foo --bar=baz'
+flags+=' --greeting=&quot;Hello world&quot;'  # This won’t work as intended, word splitting will occur between Hello and world.
+mybinary ${flags}
+</code></pre>
+<pre><code class="language-bash"># Command expansions return single strings, not arrays. Avoid
+# unquoted expansion in array assignments because it won’t
+# work correctly if the command output contains special
+# characters or whitespace.
+
+# This expands the listing output into a string, then does special keyword
+# expansion, and then whitespace splitting.  Only then is it turned into a
+# list of words.  The ls command may also change behavior based on the user's
+# active environment!
+declare -a files=($(ls /directory))
+
+# The get_arguments writes everything to STDOUT, but then goes through the
+# same expansion process above before turning into a list of arguments.
+mybinary $(get_arguments)
+</code></pre>
+<p><a id="s6.7.1-arrays-pros"></a></p>
+<h4 id="arrays-pros">Arrays Pros</h4>
+<ul>
+<li>Using Arrays allows lists of things without confusing quoting
+    semantics. Conversely, not using arrays leads to misguided
+    attempts to nest quoting inside a string.</li>
+<li>Arrays make it possible to safely store sequences/lists of
+    arbitrary strings, including strings containing whitespace.</li>
+</ul>
+<p><a id="s6.7.2-arrays-cons"></a></p>
+<h4 id="arrays-cons">Arrays Cons</h4>
+<p>Using arrays can risk a script’s complexity growing.</p>
+<p><a id="s6.7.3-arrays-decision"></a></p>
+<h4 id="arrays-decision">Arrays Decision</h4>
+<p>Arrays should be used to safely create and pass around lists, at least
+where possible and with good reason. In particular, when building a set
+of command arguments, use arrays to avoid confusing quoting issues. Use
+quoted expansion – <code>"${array[@]}"</code> – to access arrays. However, if more
+advanced data manipulation is required, shell scripting should be
+avoided altogether; see <a href="#when-to-use-shell">above</a>.</p>
+<p><a id="s7.8-pipes-to-while"></a></p>
+<h3 id="pipes-to-while">Pipes to While</h3>
+<p>Use process substitution or the <code>readarray</code> builtin (bash4+) in preference to
+piping to <code>while</code>. Pipes create a subshell, so any variables modified within a
+pipeline do not propagate to the parent shell.</p>
+<p>The implicit subshell in a pipe to <code>while</code> can introduce subtle bugs that are
+hard to track down.</p>
+<pre><code class="language-bash">last_line='NULL'
+the_command | while read -r line; do
+    if [[ -n &quot;${line}&quot; ]]; then
+        last_line=&quot;${line}&quot;
+    fi
+done
+
+# This will always output 'NULL'!
+echo &quot;${last_line}&quot;
+</code></pre>
+<p>Using process substitution also creates a subshell. However, it allows
+redirecting from a subshell to a <code>while</code> without putting the <code>while</code> (or any
+other command) in a subshell.</p>
+<pre><code class="language-bash">last_line='NULL'
+while read line; do
+    if [[ -n &quot;${line}&quot; ]]; then
+        last_line=&quot;${line}&quot;
+    fi
+done &lt; &lt;(the_command)
+
+# This will output the last non-empty line from the_command
+echo &quot;${last_line}&quot;
+</code></pre>
+<p>Alternatively, use the <code>readarray</code> builtin to read the file into an array, then
+loop over the array's contents. Notice that (for the same reason as above) I
+need to use a process substitution with <code>readarray</code> rather than a pipe, but with
+the advantage that the input generation for the loop is located before it,
+rather than after.</p>
+<pre><code class="language-bash">last_line='NULL'
+readarray -t lines &lt; &lt;(the_command)
+for line in &quot;${lines[@]}&quot;; do
+    if [[ -n &quot;${line}&quot; ]]; then
+        last_line=&quot;${line}&quot;
+    fi
+done
+echo &quot;${last_line}&quot;
+</code></pre>
+<blockquote>
+<p>Note: Be cautious using a for-loop to iterate over output, as in <code>for var in
+$(...)</code>, as the output is split by whitespace, not by line. Sometimes I will
+know this is safe because the output can't contain any unexpected whitespace,
+but where this isn't obvious or doesn't improve readability (such as a long
+command inside <code>$(...)</code>), a <code>while read</code> loop or <code>readarray</code> is often safer
+and clearer.</p>
+</blockquote>
+<p><a id="s7.9-arithmetic"></a></p>
+<h3 id="arithmetic">Arithmetic</h3>
+<p>Always use <code>(( … ))</code> or <code>$(( … ))</code> rather than <code>let</code> or <code>$[ … ]</code> or
+<code>expr</code>.</p>
+<p>Never use the <code>$[ … ]</code> syntax, the <code>expr</code> command (at least for
+arithmetic, sh supports <code>(( … ))</code>), or the <code>let</code> built-in.</p>
+<p><code>&lt;</code> and <code>&gt;</code> don't perform numerical comparison inside <code>[[ … ]]</code>
+expressions (they perform lexicographical comparisons instead; see
+<a href="#testing-strings">Testing Strings</a>). For preference, don't use <code>[[ … ]]</code>
+<em>at all</em> for numeric comparisons, use <code>(( … ))</code> instead.</p>
+<p>It is recommended to avoid using <code>(( … ))</code> as a standalone statement, and
+otherwise be wary of its expression evaluating to zero - particularly with
+<code>set -e</code> enabled. For example, <code>set -e; i=0; (( i++ ))</code> will cause the
+shell to exit.</p>
+<pre><code class="language-bash"># Simple calculation used as text - note the use of $(( … )) within
+# a string.
+echo &quot;$(( 2 + 2 )) is 4&quot;
+
+# When performing arithmetic comparisons for testing
+if (( a &lt; b )); then
+  …
+fi
+
+# Some calculation assigned to a variable.
+(( i = 10 * j + 400 ))
+</code></pre>
+<pre><code class="language-bash"># This form is non-portable and deprecated
+i=$[2 * 10]
+
+# Despite appearances, 'let' isn't one of the declarative keywords,
+# so unquoted assignments are subject to globbing wordsplitting.
+# For the sake of simplicity, avoid 'let' and use (( … ))
+let i=&quot;2 + 2&quot;
+
+# The expr utility is an external program and not a shell builtin.
+i=$( expr 4 + 4 )
+
+# Quoting can be error prone when using expr too.
+i=$( expr 4 '*' 4 )
+</code></pre>
+<p>Stylistic considerations aside, the shell's built-in arithmetic is
+many times faster than <code>expr</code>.</p>
+<p>When using variables, the <code>${var}</code> (and <code>$var</code>) forms are not required
+within <code>$(( … ))</code>. The shell knows to look up <code>var</code> for myself, and
+omitting the <code>${…}</code> leads to cleaner code. This is slightly contrary to
+the previous rule about always using braces, so this is a recommendation only.</p>
+<pre><code class="language-bash"># N.B.: Remember to declare variables as integers when
+# possible, and to prefer local variables over globals.
+local -i hundred=$(( 10 * 10 ))
+declare -i five=$(( 10 / 2 ))
+
+# Increment the variable &quot;i&quot; by three.
+# Note that:
+#  - We do not write ${i} or $i.
+#  - We put a space after the (( and before the )).
+(( i += 3 ))
+
+# To decrement the variable &quot;i&quot; by five:
+(( i -= 5 ))
+
+# Do some complicated computations.
+# Note that normal arithmetic operator precedence is observed.
+hr=2
+min=5
+sec=30
+echo $(( hr * 3600 + min * 60 + sec )) # prints 7530 as expected
+</code></pre>
+<p><a id="s8-naming-conventions"></a></p>
+<h2 id="naming-conventions">Naming Conventions</h2>
+<p><a id="s8.1-function-names"></a></p>
+<h3 id="function-names">Function Names</h3>
+<p>Lower-case, with underscores to separate words. Separate libraries with
+<code>::</code>. Parentheses are required after the function name. Do not use the
+keyword <code>function</code> as this is not as portable.</p>
+<p>If you're writing single functions, use lowercase and separate words
+with underscore. If you're writing a package, separate package names
+with <code>::</code>. Braces must be on the same line as the function
+name (as with other languages at Google) and no space between the
+function name and the parenthesis.</p>
+<pre><code class="language-bash"># Single function
+my_func() {
+    …
+}
+
+# Part of a package
+mypackage::my_func() {
+    …
+}
+
+# define function with function keyword...DO NOT USE
+function my_func() {
+    …
+}
+</code></pre>
+<p><a id="s8.2-variable-names"></a></p>
+<h3 id="variable-names">Variable Names</h3>
+<p>As for function names.</p>
+<p>Variables names for loops should be similarly named for any variable
+being looping through.</p>
+<pre><code class="language-bash">for zone in &quot;${zones[@]}&quot;; do
+    something_with &quot;${zone}&quot;
+done
+</code></pre>
+<p><a id="s8.3-constants-and-environment-variable-names"></a></p>
+<h3 id="constants-and-environment-variable-names">Constants and Environment Variable Names</h3>
+<p>All caps, separated with underscores, declared at the top of the file/function.</p>
+<p>Constants and anything exported to the environment should be
+capitalized. Constants should be anything that is literal,
+that said, PROGRAM_NAME is an exception.</p>
+<pre><code class="language-bash"># Constant
+readonly PATH_TO_FILES='/some/path'
+
+# Both constant and environment
+declare -xr ORACLE_SID='PROD'
+
+# variable is assigned from literal string
+readonly PROGRAM_NAME=&quot;pathjoin&quot;
+
+# same variable but assigned value based on another variable's input
+# will still be capitalized
+readonly PROGRAM_NAME=&quot;$(basename &quot;$0&quot;)&quot;
+</code></pre>
+<p><a id="s8.4-source-filenames"></a></p>
+<h3 id="source-filenames">Source Filenames</h3>
+<p>Lowercase, with underscores to separate words if desired.</p>
+<p>This is for consistency with other code styles in Google:
+<code>maketemplate</code> or <code>make_template</code> but not
+<code>make-template</code>.</p>
+<p><a id="s8.5-read-only-variables"></a></p>
+<h3 id="read-only-variables">Read-only Variables</h3>
+<p>Use <code>readonly</code> or <code>declare -r</code> to ensure they're
+read only.</p>
+<p>As globals are widely used in shell, it's important to catch errors
+when working with them. When you declare a variable that is meant to
+be read-only, make this explicit.</p>
+<pre><code class="language-bash">zip_version=&quot;$(dpkg --status zip | grep Version: | cut -d ' ' -f 2)&quot;
+if [ -z &quot;${zip_version}&quot; ]; then
+    error_message
+else
+    readonly zip_version
+fi
+</code></pre>
+<p><a id="s8.6-use-local-variables"></a></p>
+<h3 id="use-local-variables">Use Local Variables</h3>
+<p>Declare function-specific variables with <code>local</code>. Declaration
+and assignment should be on different lines.</p>
+<p>Ensure that local variables are only seen inside a function and its
+children by using <code>local</code> when declaring them. This avoids
+polluting the global name space and inadvertently setting variables
+that may have significance outside the function.</p>
+<p>Declaration and assignment must be separate statements when the
+assignment value is provided by a command substitution; as the
+<code>local</code> builtin does not propagate the exit code from the
+command substitution.</p>
+<pre><code class="language-bash">my_func2() {
+    # BAD
+    local name=&quot;$1&quot;
+
+    # Separate lines for declaration and assignment:
+    local my_var
+    my_var=&quot;$(my_func)&quot;
+    (( $? == 0 )) || return
+
+    …
+}
+</code></pre>
+<pre><code class="language-bash">my_func2() {
+    # DO NOT do this:
+    # $? will always be zero, as it contains the exit code of 'local', not my_func
+    local my_var=&quot;$(my_func)&quot;
+    (( $? == 0 )) || return
+
+    …
+}
+</code></pre>
+<p><a id="s8.7-function-location"></a></p>
+<h3 id="function-location">Function Location</h3>
+<p>Put all functions together in the file just below constants. Don't hide
+executable code between functions. Doing so makes the code difficult to follow
+and results in nasty surprises when debugging.</p>
+<p>If I got functions, put them all together near the top of the
+file. Only sourcing other files, <code>set</code> statements and setting constants
+may be done before declaring functions.</p>
+<p><a id="s8.8-main"></a></p>
+<h3 id="main">main</h3>
+<p>A function called <code>main</code> is required for scripts long enough
+to contain at least one other function.</p>
+<p>In order to easily find the start of the program, put the main program
+in a function called <code>main</code> as the bottom most function.
+This provides consistency with the rest of the code base as well as
+allowing myself to define more variables as <code>local</code> (which
+can't be done if the main code is not a function). The last
+non-comment line in the file should be a call to <code>main</code>:</p>
+<pre><code class="language-bash">main &quot;$@&quot;
+</code></pre>
+<p>Obviously, for short scripts where it's just a linear flow,
+<code>main</code> is overkill and so it is not required.</p>
+<p><a id="s9-calling-commands"></a></p>
+<h2 id="calling-commands">Calling Commands</h2>
+<p><a id="s9.1-checking-return-values"></a></p>
+<h3 id="checking-return-values">Checking Return Values</h3>
+<p>Always check return values and give informative return values.</p>
+<p>For unpiped commands, use <code>$?</code> or check directly via an
+<code>if</code> statement to keep it simple. That said, checking directly
+via <code>if</code> statement is preferred over indirectly.</p>
+<p>Example:</p>
+<pre><code class="language-bash"># preferred
+if ! mv &quot;${file_list[@]}&quot; &quot;${dest_dir}/&quot;; then
+    echo &quot;Unable to move ${file_list[*]} to ${dest_dir}&quot; &gt;&amp;2
+    exit 1
+fi
+
+# not preferred as much (at least according to shellcheck)
+mv &quot;${file_list[@]}&quot; &quot;${dest_dir}/&quot;
+if (( $? != 0 )); then
+    echo &quot;Unable to move ${file_list[*]} to ${dest_dir}&quot; &gt;&amp;2
+    exit 1
+fi
+</code></pre>
+<p>Bash also has the <code>PIPESTATUS</code> variable does not exist for sh) that allows
+checking of the return code from all parts of a pipe. If it's only
+necessary to check success or failure of the whole pipe, then the
+following is acceptable:</p>
+<pre><code class="language-bash">tar -cf - ./* | ( cd &quot;${dir}&quot; &amp;&amp; tar -xf - )
+if (( PIPESTATUS[0] != 0 || PIPESTATUS[1] != 0 )); then
+    echo &quot;Unable to tar files to ${dir}&quot; &gt;&amp;2
+fi
+</code></pre>
+<p>However, as <code>PIPESTATUS</code> will be overwritten as soon as you
+do any other command, if you need to act differently on errors based
+on where it happened in the pipe, you'll need to assign
+<code>PIPESTATUS</code> to another variable immediately after running
+the command (don't forget that <code>[</code> is a command and will
+wipe out <code>PIPESTATUS</code>).</p>
+<pre><code class="language-bash">tar -cf - ./* | ( cd &quot;${DIR}&quot; &amp;&amp; tar -xf - )
+return_codes=( &quot;${PIPESTATUS[@]}&quot; )
+if (( return_codes[0] != 0 )); then
+    do_something
+fi
+if (( return_codes[1] != 0 )); then
+    do_something_else
+fi
+</code></pre>
+<p><a id="s9.2-builtin-commands-vs-external-commands"></a></p>
+<h3 id="builtin-commands-vs-external-commands">Builtin Commands vs. External Commands</h3>
+<p>Given the choice between invoking a shell builtin and invoking a
+separate process, choose the builtin.</p>
+<p>That is, if the builtin is a generic shell builtin. As stated before,
+shell code should be generic where possible. A separate process may
+be necessary.</p>
+<p>We prefer the use of builtins such as the <em>Parameter Expansion</em>
+functions in <code>bash(1)</code> as it's more robust and portable
+(especially when compared to things like <code>sed</code>).</p>
+<p>Examples:</p>
+<pre><code class="language-bash"># Prefer this:
+addition=$(( X + Y ))
+substitution=&quot;${string/#foo/bar}&quot;
+</code></pre>
+<pre><code class="language-bash"># Instead of this:
+addition=&quot;$(expr &quot;${X}&quot; + &quot;${Y}&quot;)&quot;
+substitution=&quot;$(echo &quot;${string}&quot; | sed -e 's/^foo/bar/')&quot;
+</code></pre>
+<p><a id="s9.3-long-options-over-short-options"></a></p>
+<h3 id="long-options-over-short-options">Long Options Over Short Options</h3>
+<p>Whenever using a command in a shell script/function, if that command takes
+options, always use long options. Using long options helps the code be
+more readable and can possible give a clue to the reader what the option(s)
+do for said command if they are unfamiliar with the option(s).</p>
+<p>Examples:</p>
+<pre><code class="language-bash"># Do this:
+mkdir --parents &quot;${HOME}&quot;
+ln --symbolic --force &quot;${target}&quot; &quot;./${link_name}&quot;
+</code></pre>
+<pre><code class="language-bash"># Don't do this:
+mkdir -p &quot;${HOME}&quot;
+ln -sf &quot;${target}&quot; &quot;./${link_name}&quot;
+</code></pre>
+<p><a id="s9.4-dependency-checking"></a></p>
+<h3 id="dependency-checking">Dependency Checking</h3>
+<p>Typically you would have this handle through some form of
+package manager, but lets assume majority of shell scripts/programs
+that are written are standalone.</p>
+<p>In this case, the assumption is of currently that any shell code I
+write will be ran on a target system that has access to at least the
+typical <code>GNU</code> packages that come with a standard Linux system. This
+means I should not have to check for tools such as <code>cp</code>, <code>mkdir</code>,
+<code>basename</code>, <code>envsubst</code>, etc.</p>
+<p>Any other dependency should be installed and is assumed to be accessible
+from the path. The following should be used when checking for a dependency
+on the path (is POSIX compliant vs using <a href="https://stackoverflow.com/questions/592620/how-can-i-check-if-a-program-exists-from-a-bash-script">which</a>):</p>
+<pre><code class="language-bash">if [ -z &quot;$(command -v jq)&quot; ]; then
+    echo &quot;${PROGRAM_NAME}: jq cannot be found in the PATH!&quot; &gt;&amp;2
+    exit 1
+fi
+</code></pre>
+<p><a id="s10-conclusion"></a></p>
+<h2 id="conclusion">Conclusion</h2>
+<p>Use common sense and <em>BE MORE CONSISTENT</em>.</p></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = ".",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="js/base.js" defer></script>
+        <script src="search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
