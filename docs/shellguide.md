@@ -521,7 +521,6 @@ eval set -- "$(getopt --options "${short_opts}" --long "${HELP_LONG_OPT}" --name
 while true; do
     case "$1" in
         "-${HELP_SHORT_OPT}" | "--${HELP_LONG_OPT}")                        help_option=true; shift ;;
-        "-${RELATIVE_PATH_SHORT_OPT}" | "--${RELATIVE_PATH_LONG_OPT}")      path_prefix="./"; shift ;;
         "--")                                                               shift; break ;;
         *)                                                                  break ;;
     esac
