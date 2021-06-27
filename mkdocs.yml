@@ -1,0 +1,21 @@
+site_name: Styleguides
+docs_dir: docs
+# site_url/use_directory_urls were set as mkdocs 1.2.1 complained otherwise
+site_url:
+use_directory_urls: False
+nav:
+  - Home: index.md
+  - Code Style Guides: 
+    - Shell Style Guide: shellguide.md
+theme:
+    name: mkdocs
+    nav_style: dark
+    highlightjs: True
+    # NOTE(cavcrosby): mkdocs theme uses the highlight.js lib, which supports
+    # a lot of styles, for reference:
+    # https://highlightjs.org/static/demo/
+    hljs_style: stackoverflow-light
+    hljs_languages:
+      - bash
+extra_css:
+    - css/extra.css

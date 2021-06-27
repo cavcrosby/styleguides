@@ -1,0 +1,1454 @@
+# Shell Style Guide
+
+## Table of Contents
+
+Section                                                                              | Contents
+------------------------------------------------------------------------------------ | --------
+[Background](#s1-background)                                                         | [Which Shell to Use](#s1.1-which-shell-to-use) - [When to use Shell](#s1.2-when-to-use-shell)
+[Shell Files and Interpreter Invocation](#s2-shell-files-and-interpreter-invocation) | [File Extensions](#s2.1-file-extensions) - [SUID/SGID](#s2.2-suid-sgid)
+[Environment](#s3-environment)                                                       | [STDOUT vs STDERR](#s3.1-stdout-vs-stderr)
+[Comments](#s4-comments)                                                             | [File Header](#s4.1-file-header) - [Function Comments](#s4.2-function-comments) - [Implementation Comments](#s4.3-implementation-comments)
+[Comment Tags](#s5-comment-tags)                                                     | [TODO Comments](#s5.1-todo-tags) - [NOTE Comments](#s5.2-note-tags) - [NOTES Comments](#s5.3-notes-tags) - [DISCUSS Comments](#s5.4-discuss-tags)
+[Formatting](#s6-formatting)                                                         | [Indentation](#s6.1-indentation) - [Line Length and Long Strings](#s6.2-line-length-and-long-strings) - [Pipelines](#s6.3-pipelines) - [Loops](#s6.4-loops) - [Case statement](#s6.5-case-statement) - [Variable expansion](#s6.6-variable-expansion) - [Quoting](#s6.7-quoting) - [CLI](#s6.8-cli)
+[Features and Bugs](#s7-features-and-bugs)                                           |    [ShellCheck](#s7.1-shellcheck) - [Command Substitution](#s7.2-command-substitution) - [Test, [… ], and [[… ]]](#s7.3-tests) - [Testing Strings](#s7.4-testing-strings) - [Wildcard Expansion of Filenames](#s7.5-wildcard-expansion-of-filenames) - [Eval](#s7.6-eval) - [Arrays](#s7.7-arrays) - [Pipes to While](#s7.8-pipes-to-while) - [Arithmetic](#s7.9-arithmetic)
+[Naming Conventions](#s8-naming-conventions)                                         | [Function Names](#s8.1-function-names) - [Variable Names](#s8.2-variable-names) - [Constants and Environment Variable Names](#s8.3-constants-and-environment-variable-names) - [Source Filenames](#s8.4-source-filenames) - [Read-only Variables](#s8.5-read-only-variables) - [Use Local Variables](#s8.6-use-local-variables) - [Function Location](#s8.7-function-location) - [main](#s8.8-main)
+[Calling Commands](#s9-calling-commands)                                             | [Checking Return Values](#s9.1-checking-return-values) - [Builtin Commands vs. External Commands](#s9.2-builtin-commands-vs-external-commands) - [Long Options Over Short Options](#s9.3-long-options-over-short-options) - [Dependency Checking](#s9.4-dependency-checking)
+[Conclusion](#s10-conclusion)                                                        |
+
+<a id="s1-background"></a>
+
+## Background
+
+<a id="s1.1-which-shell-to-use"></a>
+
+### Which Shell to Use
+
+**`Bash`** should be used for executables if the following criteria is desired:
+
+*   portability across different systems are of a concern (vs. shells like fish, zsh)
+*   I want potentially substantial gains in readability over plain vanilla **`sh`**
+*   I have a need for particular feature of the bash shell (e.g. arrays)
+
+If wanting to stick closer to **POSIX** compliance (can ensure a bit more
+portability) then vanilla `sh` should be used (or some variant that is
+closer to POSIX compliance). Even if executables are written to target
+bash, features specific to bash ([bashisms](https://mywiki.wooledge.org/Bashism)) should
+be kept to a minimum. By following this, in theory, shell code written to
+target bash should not need major reworking to work for a different shell.
+
+Going forward, any context that uses `bash` can be replaced with `sh`.
+At least mostly, as bash specific features obviously won't work with sh
+(e.g. arrays).
+
+The only exception for using a particular shell is where I am forced to
+by whatever I am coding for. One example of this is Solaris SVR4
+packages which require plain Bourne shell (`sh`) for any scripts.
+
+<a id="s1.2-when-to-use-shell"></a>
+
+### When to use Shell
+
+Ideally, the Shell should only be used
+for simple utilities or simple wrapper scripts. 
+
+While shell scripting isn't a development language, it is used for
+writing various utility scripts throughout Google. This style guide
+is more a recognition of its use rather than a suggestion that it be
+used for widespread deployment.
+
+Some guidelines:
+
+*   If I am mostly calling other utilities and are doing relatively
+    little data manipulation, shell is an acceptable choice for the task.
+*   If performance matters, use something other than shell.
+*   If I am writing a script that is more than 100 lines long, or
+    that uses non-straightforward control flow logic, I should
+    rewrite it in a more structured language *now*. Bear in
+    mind that scripts grow. Rewrite the script early to avoid a more
+    time-consuming rewrite at a later date.
+*   When assessing the complexity of the shell code (e.g. to decide whether
+    to switch languages) consider whether the code is easily
+    maintainable by people other than me.
+
+<a id="s2-shell-files-and-interpreter-invocation"></a>
+
+## Shell Files and Interpreter Invocation
+
+<a id="s2.1-file-extensions"></a>
+
+### File Extensions
+
+Executables must start with **`#!/bin/bash`**(known as the shabang line)
+and a minimum number of flags. Use `set` to set shell options so that
+calling my script as `bash script_name` does not break its functionality.
+If the file is a library, then no shabang line is needed to be added.
+
+Executables should have no extension (***strongly*** preferred) or a
+`.sh` extension. Libraries must have a `.sh`
+extension and should not be executable.
+
+It is not necessary to know what language a program is written in when
+executing it and shell doesn't require an extension so I prefer not
+to use one for executables.
+
+However, for libraries it's important to know what language it is and
+sometimes there's a need to have similar libraries in different
+languages. This allows library files with identical purposes but
+different languages to be identically named except for the
+language-specific suffix.
+
+<a id="s2.2-suid-sgid"></a>
+
+### SUID/SGID
+
+SUID and SGID are *forbidden* on shell scripts.
+
+There are too many security issues with shell that make it nearly
+impossible to secure sufficiently to allow SUID/SGID. While bash does
+make it difficult to run SUID, it's still possible on some platforms
+which is why I am being explicit about banning it.
+
+Use `sudo` to provide elevated access if I need it.
+
+<a id="s3-environment"></a>
+
+## Environment
+
+<a id="s3.1-stdout-vs-stderr"></a>
+
+### STDOUT vs STDERR
+
+All error messages should go to `STDERR`.
+
+This makes it easier to separate normal status from actual issues.
+
+Currently while my **dotfiles** do include ANSI escape color sequences for
+status messages, unless the project the shell code is in also includes
+the ANSI escape color sequences, it is advised to use the following below
+as the format for messages to stderr.
+
+```bash
+if [ -z "$(command -v git)" ]; then
+    echo "${PROGRAM_NAME}: git cannot be found in the PATH!" >&2
+    exit 1
+fi
+```
+
+<a id="s4-comments"></a>
+
+## Comments
+
+<a id="s4.1-file-header"></a>
+
+### File Header
+
+Start each file with a description of its contents.
+
+Every file must have a top-level comment including a brief overview of
+its contents. \*.conf, \*.cfg, \*.env (or any other named variant, e.g.
+*.test_env) files should also contain this header, just without the
+shabang line.
+
+Example:
+
+```bash
+#!/bin/bash
+#
+# Perform hot backups of Oracle databases.
+```
+
+<a id="s4.2-function-comments"></a>
+
+### Function Comments
+
+All shell functions must be commented.
+
+It should be possible for someone else to learn how to use my
+program or to use a function in my library by reading the comments
+(and self-help, if provided) without reading the code.
+
+All function comments should describe the intended API behaviour using (and in this order):
+
+*   Description of the function.
+*   Globals: List of global variables used and/or modified. (default if not listed, **None**)
+*   Arguments: Arguments taken. (default if not listed, **None**)
+*   Outputs: Output to STDOUT or STDERR. (default if not listed, **None**)
+*   Returns: Returned values other than the exit/return code of commands.
+    *   Even if there is a slight chance that a command might return the exit
+        code of a hardcoded exit code, I can assume it should mostly be the hardcoded
+        status code that is returned.
+
+If a function also serves a CLI, then the CLI options should also be
+account for in the 'Arguments' section of a function.
+
+Examples:
+
+```bash
+#######################################
+# Cleanup files from the backup directory.
+# Globals:
+#   BACKUP_DIR
+#   ORACLE_SID
+#######################################
+cleanup() {
+    …
+}
+
+#######################################
+# Get configuration directory.
+# Globals:
+#   SOMEDIR
+# Outputs:
+#   - Writes location to stdout
+#######################################
+get_dir() {
+    echo "${SOMEDIR}"
+}
+
+#######################################
+# Gets a file based on the url.
+# Globals:
+#   PROGRAM_NAME
+# Outputs:
+#   - Command errors to stderr (e.g. wget "$1")
+#   - Custom errors to stderr (e.g. echo "${PROGRAM_NAME}:...")
+# Returns:
+#   - 0: success
+#   - 1: wget is not in the path
+#######################################
+get_file() {
+    if [ -z "$(command -v wget)" ]; then
+        echo "${PROGRAM_NAME}: wget cannot be found in the PATH!" >&2
+        return 1
+    wget "$1"
+    return # should return exit status of wget
+}
+
+#######################################
+# Removes a file, echos a file, and creates
+# numerous files.
+# Arguments:
+#   $1: A file path to delete.
+#   $2: A file path to echo.
+#   $n: File names to create.
+#######################################
+do_things() {
+    rm "$1"; shift
+    echo "$1"; shift
+    while [ $# -gt 0 ]; do
+        touch "$1"
+        shift
+    done
+}
+
+#######################################
+# Removes a file from the system.
+# Arguments:
+#   -h/--help: show help message and exit.
+#   $1: A file path to delete.
+#######################################
+del_thing() {
+    # constants and defined cli parameters, opt ==> option
+    readonly PROGRAM_NAME="del_thing"
+    readonly HELP_SHORT_OPT="h"
+    readonly HELP_LONG_OPT="help"
+
+    short_opts="${HELP_SHORT_OPT}"
+    path_prefix="/"
+    help_option=false
+    # do not combine long opts into their own variable
+    eval set -- "$(getopt --options "${short_opts}" --long "${HELP_LONG_OPT}" --name "${PROGRAM_NAME}" -- "$@")"
+    …
+}
+```
+
+<a id="s4.3-implementation-comments"></a>
+
+### Implementation Comments
+
+Comment tricky, non-obvious, interesting or important parts of the
+code.
+
+This follows general Google coding comment practice. Don't comment
+everything. If there's a complex algorithm or you're doing something
+out of the ordinary, put a short comment in.
+
+<a id="s5-comment-tags"></a>
+
+## Comment Tags
+
+Below are the formats for comment tags that should be used throughout the
+shell code. All tags should have their respective name in all caps, followed
+by the name ***`cavcrosby`***. The main purpose of this is to have consistent
+comment tags across my shell code that can be searched.
+
+<a id="s5.1-todo-tags"></a>
+
+### TODO Tags
+
+Use `TODO` tags/comments for code that is temporary, a short-term solution, or
+good-enough but not perfect. A `TODO` is not a commitment that the I will
+fix the problem. At least not immediately.
+
+Examples:
+
+```bash
+# TODO(cavcrosby): need to implement new option to allow easier convenience
+```
+
+<a id="s5.2-note-tags"></a>
+
+### NOTE Tags
+
+`NOTE` tags/comments be used to denote comments that should gartner a bit
+more attention than a typical code comment. NOTE comment should be less
+than 2 sentences and does not end with a period. The first word in a NOTE
+comment (after NOTE:) does not have its first letter capitalized.
+
+Examples:
+
+```bash
+# NOTE(cavcrosby): currently used because foo is not available on all systems
+```
+
+<a id="s5.3-notes-tags"></a>
+
+### NOTES Tags
+
+`NOTES` tags/comments are the same as `NOTE` comments, but are at least 2 sentences.
+They may be used more to elaborate about the reasoning behind the
+implementation of the code that they are next to. That said, they shouldn't
+be of great lengths. At the moment the max is roughly 5 sentences.
+
+Examples:
+
+```bash
+# NOTES(cavcrosby): currently used because foo is not available on all systems.
+# For now bar will be used in foo's place.
+```
+
+<a id="s5.4-discuss-tags"></a>
+
+### DISCUSS Tags
+
+`DISCUSS` tags/comments are reversed for areas in code that still need
+to be thought out/researched before implementation or there may be code
+that needs to be discussed in about its implementation. Typically these
+are areas that have greater impact than TODO comments because they could 
+affect multiple repos.
+
+Examples:
+
+```bash
+# DISCUSS(cavcrosby): the variable names throughout are clunky. Could this be improved
+# aboard? Can there at least be consistency in this repo?
+```
+
+<a id="s6-formatting"></a>
+
+## Formatting
+
+While I should follow the style that's already there for files that
+I am modifying, the following are required for any new code I write or
+for files that are own by me.
+
+<a id="s6.1-indentation"></a>
+
+### Indentation
+
+Indent **4** spaces. No tabs.
+
+Use blank lines between blocks to improve readability. Indentation is
+four spaces.
+
+<a id="s6.2-line-length-and-long-strings"></a>
+
+### Line Length and Long Strings
+
+Maximum line length is 70ish characters (Google states their strings stop
+at 80 max). This is to stay consistent with Python code (PEP 8 compliant
+anyways) I write.
+
+If I have to write strings that are a lot longer than 70ish characters, this
+should be done with a here document or an embedded newline if possible.
+Literal strings that have to be a lot longer than 70ish characters and
+can't sensibly be split are ok, but it's strongly preferred to find a
+way to make it shorter.
+
+```bash
+# DO use 'here document's
+cat <<END
+I am an exceptionally long
+string.
+END
+
+# Embedded newlines are ok too
+long_string="I am an exceptionally
+long string."
+```
+
+<a id="s6.3-pipelines"></a>
+
+### Pipelines
+
+Pipelines should be split one per line if they don't all fit on one
+line.
+
+If a pipeline all fits on one line, it should be on one line.
+
+If not, it should be split at one pipe segment per line with the pipe
+on the newline and a 4 space indent for the next section of the pipe.
+This applies to a chain of commands combined using `|` as well as to
+logical control operators `||` and `&&`.
+
+```bash
+# All fits on one line
+command1 | command2
+
+# Long commands
+command1 \
+    | command2 \
+    | command3 \
+    | command4
+```
+
+<a id="s6.4-loops"></a>
+
+### Loops
+
+Put `; do` and `; then` on the same line as the
+`while`, `for` or `if`.
+
+Loops in shell are a bit different, but I should follow the same principles
+as with braces when declaring functions. That is: `; then`
+and `; do` should be on the same line as the if/for/while.
+`else` should be on its own line and closing statements
+should be on their own line vertically aligned with the opening
+statement.
+
+Example:
+
+```bash
+# If inside a function, consider declaring the loop variable as
+# a local to avoid it leaking into the global environment:
+# local dir
+for dir in "${dirs_to_cleanup[@]}"; do
+    if [ -d "${dir}/${ORACLE_SID}" ]; then
+        log_date "Cleaning up old files in ${dir}/${ORACLE_SID}"
+        rm "${dir}/${ORACLE_SID}/"*
+        if (( $? != 0 )); then
+            error_message
+        fi
+    else
+        mkdir -p "${dir}/${ORACLE_SID}"
+        if (( $? != 0 )); then
+            error_message
+        fi
+    fi
+done
+```
+
+<a id="s6.5-case-statement"></a>
+
+### Case statement
+
+*   Indent alternatives by 4 spaces.
+*   A one-line alternative needs a space after the close parenthesis of
+    the pattern and before the `;;`.
+*   Long or multi-command alternatives should be split over multiple
+    lines with the pattern, actions, and `;;` on separate
+    lines.
+
+The matching expressions are indented one level from the `case` and `esac`.
+Multiline actions are indented another level. In general, there is no need to
+quote match expressions. Pattern expressions should not be preceded by an open
+parenthesis. Avoid the `;&` and `;;&` notations, a bash feature to the case
+statement.
+
+```bash
+case "${expression}" in
+    a)
+        variable="…"
+        some_command "${variable}" "${other_expr}" …
+        ;;
+    absolute)
+        actions="relative"
+        another_command "${actions}" "${other_expr}" …
+        ;;
+    *)
+        error "Unexpected expression '${expression}'"
+        ;;
+esac
+```
+
+Simple commands may be put on the same line as the pattern <i>and</i>
+`;;` as long as the expression remains readable. This is
+often appropriate for option processing. When the
+actions don't fit on a single line, put the pattern on a line on its
+own, then the actions, then `;;` also on a line of its own.
+When on the same line as the actions, use a space after the close
+parenthesis of the pattern and another before the `;;`.
+
+```bash
+# short option processing
+verbose='false'
+aflag=''
+bflag=''
+files=''
+while getopts 'abf:v' flag; do
+    case "${flag}" in
+        a) aflag='true' ;;
+        b) bflag='true' ;;
+        f) files="${OPTARG}" ;;
+        v) verbose='true' ;;
+        *) error "Unexpected option ${flag}" ;;
+    esac
+done
+```
+
+```bash
+# short/long option processing
+# constants and defined cli parameters, opt ==> option
+readonly PROGRAM_NAME="foo"
+readonly HELP_SHORT_OPT="h"
+readonly HELP_LONG_OPT="help"
+
+short_opts="${HELP_SHORT_OPT}"
+path_prefix="/"
+help_option=false
+# do not combine long opts into their own variable
+eval set -- "$(getopt --options "${short_opts}" --long "${HELP_LONG_OPT}" --name "${PROGRAM_NAME}" -- "$@")"
+while true; do
+    case "$1" in
+        "-${HELP_SHORT_OPT}" | "--${HELP_LONG_OPT}")                        help_option=true; shift ;;
+        "-${RELATIVE_PATH_SHORT_OPT}" | "--${RELATIVE_PATH_LONG_OPT}")      path_prefix="./"; shift ;;
+        "--")                                                               shift; break ;;
+        *)                                                                  break ;;
+    esac
+done
+…
+```
+
+<a id="s6.6-variable-expansion"></a>
+
+### Variable expansion
+
+In order of precedence: Stay consistent with what I find; quote
+variables; prefer `"${var}"` over `"$var"`.
+
+These are strongly recommended guidelines but not mandatory
+regulation. Nonetheless, the fact that it's a recommendation and
+not mandatory doesn't mean it should be taken lightly or downplayed.
+
+They are listed in order of precedence.
+
+*   Stay consistent with what I find for existing code (that isn't mine anyways).
+*   Quote variables, see [Quoting section below](#quoting).
+*   Don't brace-delimit single character shell specials / positional parameters, unless strictly necessary or avoiding deep confusion.
+
+Prefer brace-delimiting all other variables.
+
+```bash
+# Section of *recommended* cases.
+
+# Preferred style for 'special' variables:
+echo "Positional: $1" "$5" "$3"
+echo "Specials: !=$!, -=$-, _=$_. ?=$?, #=$# *=$* @=$@ \$=$$ …"
+
+# Braces necessary:
+echo "many parameters: ${10}"
+
+# Braces avoiding confusion:
+# Output is "a0b0c0"
+set -- a b c
+echo "${1}0${2}0${3}0"
+
+# Preferred style for other variables:
+echo "PATH=${PATH}, PWD=${PWD}, mine=${some_var}"
+while read -r f; do
+    echo "file=${f}"
+done < <(find /tmp)
+```
+
+```bash
+# Section of *discouraged* cases
+
+# Unquoted vars, unbraced vars, brace-delimited single letter
+# shell specials.
+echo a=$avar "b=$bvar" "PID=${$}" "${1}"
+
+# Confusing use: this is expanded as "${1}0${2}0${3}0",
+# not "${10}${20}${30}
+set -- a b c
+echo "$10$20$30"
+```
+
+NOTE: Using braces in `${var}` is *not* a form of quoting. "Double quotes" must
+be used *as well*.
+
+<a id="s6.7-quoting"></a>
+
+### Quoting
+
+*   Always quote strings containing variables, command substitutions, spaces or
+    shell meta characters, unless careful unquoted expansion is required or it's
+    a shell-internal integer (see next point).
+*   Use arrays for safe quoting of lists of elements, especially command-line
+    flags. See [Arrays](#arrays) below.
+*   Optionally quote shell-internal, readonly special variables that are defined
+    to be integers: `$?`, `$#`, `$$`, `$!` (man bash). Prefer quoting of "named"
+    internal integer variables, e.g. PPID etc for consistency.
+*   Prefer quoting strings that are "words" (as opposed to command options or
+    path names).
+*   Never quote *literal* integers.
+*   Be aware of the quoting rules for pattern matches in `[[ … ]]`. See the
+    [Test, `[ … ]`, and `[[ … ]]`](#tests) section below.
+*   Use `"$@"` unless I have a specific reason to use `$*`, such as simply
+    appending the arguments to a string in a message or log.
+
+```bash
+# 'Single' quotes indicate that no substitution is desired.
+# "Double" quotes indicate that substitution is required/tolerated.
+
+# Simple examples
+
+# "quote command substitutions"
+# Note that quotes nested inside "$()" don't need escaping.
+flag="$(some_command and its args "$@" 'quoted separately')"
+
+# "quote variables"
+echo "${flag}"
+
+# Use arrays with quoted expansion for lists.
+declare -a FLAGS
+FLAGS=( --foo --bar='baz' )
+readonly FLAGS
+mybinary "${FLAGS[@]}"
+
+# It's ok to not quote internal integer variables.
+if (( $# > 3 )); then
+  echo "ppid=${PPID}"
+fi
+
+# "never quote literal integers"
+value=32
+# "quote command substitutions", even when I expect integers
+number="$(generate_number)"
+
+# "prefer quoting words", not compulsory
+readonly USE_INTEGER='yes'
+
+# "quote shell meta characters"
+echo 'Hello stranger, and well met. Earn lots of $$$'
+echo "Process $$: Done making \$\$\$."
+
+# "command options or path names"
+# ($1 is assumed to contain a value here)
+grep -li Hugo /dev/null "$1"
+
+# Less simple examples
+# "quote variables, unless proven false": ccs might be empty
+# from the bash man page, on ${parameter:+word}:
+# "If parameter is null or unset, nothing is substituted, otherwise the expansion of word is substituted."
+
+git send-email --to "${reviewers}" ${ccs:+"--cc" "${ccs}"}
+
+# Positional parameter precautions: $1 might be unset
+# Single quotes leave regex as-is.
+grep -cP '([Ss]pecial|\|?characters*)$' ${1:+"$1"}
+
+# For passing on arguments,
+# "$@" is right almost every time, and
+# $* is wrong almost every time:
+#
+# * $* and $@ will split on spaces, clobbering up arguments
+#   that contain spaces and dropping empty strings;
+# * "$@" will retain arguments as-is, so no args
+#   provided will result in no args being passed on;
+#   This is in most cases what I want to use for passing
+#   on arguments.
+# * "$*" expands to one argument, with all args joined
+#   by (usually) spaces,
+#   so no args provided will result in one empty string
+#   being passed on.
+# (Consult `man bash` for the nit-grits ;-)
+
+(set -- 1 "2 two" "3 three tres"; echo $#; set -- "$*"; echo "$#, $@")
+(set -- 1 "2 two" "3 three tres"; echo $#; set -- "$@"; echo "$#, $@")
+```
+
+<a id="s6.8-cli"></a>
+
+### CLI (Command Line Interface)
+
+Any shell script should have a ***fully functional*** command line interface
+readily available. Shell functions are not expected to have a ***fully functional***
+command line interface, unless this shell function happens to be the
+'main' of the script. In this case, `-h` and `--help` should be implemented
+but not shown as part of the usage string.
+
+I prefer having command line interfaces created with both long and
+short options available. `getops` only supports short options while as
+`getopt` supports both. So when given the choice use getopt, and if for
+some reason getopt is not available then getopts will work in a pinch
+([reference](https://stackoverflow.com/questions/402377/using-getopts-to-process-long-and-short-command-line-options)).
+
+Example (getopt/getops examples already exist in the document):
+
+```bash
+# NOTE(cavcrosby): this is to encourage the notion that this will not have a fully
+# functional CLI (e.g. ./PROGRAM_NAME -f foo -b bar)
+if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    cat << _EOF_
+Usage: ${PROGRAM_NAME}
+
+This program goes foo. This program does not plan on having a functional
+command line interface (CLI).
+
+_EOF_
+    exit 0
+```
+<a id="s7-features-and-bugs"></a>
+
+## Features and Bugs
+
+<a id="s7.1-shellcheck"></a>
+
+### ShellCheck
+
+The [ShellCheck project](https://www.shellcheck.net/) identifies common bugs and
+warnings for shell scripts. It is recommended for all scripts, large or
+small.
+
+<a id="s7.2-command-substitution"></a>
+
+### Command Substitution
+
+Use `$(command)` instead of backticks.
+
+Nested backticks require escaping the inner ones with `\ `.
+The `$(command)` format doesn't change when nested and is
+easier to read.
+
+Example:
+
+```bash
+# This is preferred:
+var="$(command "$(command1)")"
+```
+
+```bash
+# This is not:
+var="`command \`command1\``"
+```
+
+<a id="s7.3-tests"></a>
+
+<a id="tests"></a>
+### Test, `[ … ]`, and `[[ … ]]` 
+
+`[ … ]` is preferred over `[[ … ]]`, (don't use `test` or full path `/usr/bin/[`).
+This is in contrast to Google's opinion. Though, this isn't to say this
+is a wisest choice, but I wish to keep things generic and use the shell
+how I believe it was intended to be used.
+
+Anything between `[ … ]` should already be checked and prevented from
+performing globbing (path name expansion) or field/word splitting. Neither
+of these shell features should be desired when using `[ … ]`.
+
+Regular expression matching can be made up by using grep.
+
+```bash
+# This ensures the string on the left is made up of characters in
+# the alnum character class followed by the string name.
+if [ "$(echo "filename" | grep --extended-regexp '^[[:alnum:]]+name' --count)" -gt 0 ]; then
+    echo "Match"
+fi
+
+# This matches the exact pattern "f*" (Does not match in this case)
+# ...to be fair this is harder to read
+if [ "$(echo "filename" | grep --extended-regexp '\"f*\"' --count)" -gt 0 ]; then
+  echo "Match"
+fi
+```
+
+```bash
+# This gives a "too many arguments" error as f* is expanded to the
+# contents of the current directory
+if [ "filename" == f* ]; then
+  echo "Match"
+fi
+```
+
+For the gory details, see E14 at http://tiswww.case.edu/php/chet/bash/FAQ
+
+<a id="s7.4-testing-strings"></a>
+
+### Testing Strings
+
+Use quotes rather than filler characters where possible.
+
+Bash is smart enough to deal with an empty string in a test. So, given
+that the code is much easier to read, use tests for empty/non-empty
+strings or empty strings rather than filler characters.
+
+```bash
+# Do this:
+if [ "${my_var}" = "some_string" ]; then
+    do_something
+fi
+
+# -z (string length is zero) and -n (string length is not zero) are
+# preferred over testing for an empty string
+if [ -z "${my_var}" ]; then
+    do_something
+fi
+
+```
+
+```bash
+# Not this:
+if [[ "${my_var}X" == "some_stringX" ]]; then
+    do_something
+fi
+```
+
+To avoid confusion about what is being tested for, explicitly use
+`-z` or `-n`.
+
+```bash
+# Use this
+if [ -n "${my_var}" ]; then
+    do_something
+fi
+```
+
+```bash
+# Instead of this
+if [ "${my_var}" ]; then
+    do_something
+fi
+```
+
+While `==` is easier to read, '=' is the preferred operator for equality.
+Despite the fact '=' is also an assignment operator elsewhere.
+However, be careful when using `<` and `>`
+in `[[ … ]]` which performs a lexicographical comparison.
+Use `(( … ))` or `-lt` and `-gt` for
+numerical comparison.
+
+```bash
+# Use this
+if [ "${my_var}" = "val" ]; then
+    do_something
+fi
+
+if (( my_var > 3 )); then
+    do_something
+fi
+
+if [ "${my_var}" -gt 3 ]; then
+    do_something
+fi
+```
+
+```bash
+# Probably unintended lexicographical comparison.
+if [ "${my_var}" > 3 ]; then
+    # True for 4, false for 22.
+    do_something
+fi
+```
+
+<a id="s7.5-wildcard-expansion-of-filenames"></a>
+
+### Wildcard Expansion of Filenames
+
+Use an explicit path when doing wildcard expansion of filenames.
+
+As filenames can begin with a `-`, it's a lot safer to
+expand wildcards with `./*` instead of `*`.
+
+```bash
+# Here's the contents of the directory:
+# -f  -r  somedir  somefile
+
+# Incorrectly deletes almost everything in the directory by force
+psa@bilby$ rm -v *
+removed directory: `somedir'
+removed `somefile'
+```
+
+```bash
+# As opposed to:
+psa@bilby$ rm -v ./*
+removed `./-f'
+removed `./-r'
+rm: cannot remove `./somedir': Is a directory
+removed `./somefile'
+```
+
+<a id="s7.6-eval"></a>
+
+### Eval
+
+`eval` should be use sparingly, even more so if user input is involved.
+There might be more reasons as to not use eval but I did not have use
+cases that matched why Google declared that eval should not be used for
+...I think.
+
+For now it seems to be ok when evaluating CLI options from getopt.
+
+```bash
+# What does this set?
+# Did it succeed? In part or whole?
+eval $(set_my_variables)
+
+# What happens if one of the returned values has a space in it?
+variable="$(eval some_function)"
+```
+
+<a id="s7.7-arrays"></a>
+
+### Arrays
+
+Bash arrays should be used to store lists of elements, to avoid quoting
+complications. This particularly applies to argument lists. Arrays
+should not be used to facilitate more complex data structures (see
+[When to use Shell](#when-to-use-shell) above).
+
+Arrays store an ordered collection of strings, and can be safely
+expanded into individual elements for a command or loop.
+
+Using a single string for multiple command arguments should be avoided
+at least where possible, as it inevitably leads to myself to using `eval`
+or trying to nest quotes inside the string, which does not give
+reliable or readable results and leads to needless complexity.
+
+```bash
+# An array is assigned using parentheses, and can be appended to
+# with +=( … ).
+declare -a flags
+flags=(--foo --bar='baz')
+flags+=(--greeting="Hello ${name}")
+mybinary "${flags[@]}"
+```
+
+```bash
+# Don’t use strings for sequences.
+flags='--foo --bar=baz'
+flags+=' --greeting="Hello world"'  # This won’t work as intended, word splitting will occur between Hello and world.
+mybinary ${flags}
+```
+
+```bash
+# Command expansions return single strings, not arrays. Avoid
+# unquoted expansion in array assignments because it won’t
+# work correctly if the command output contains special
+# characters or whitespace.
+
+# This expands the listing output into a string, then does special keyword
+# expansion, and then whitespace splitting.  Only then is it turned into a
+# list of words.  The ls command may also change behavior based on the user's
+# active environment!
+declare -a files=($(ls /directory))
+
+# The get_arguments writes everything to STDOUT, but then goes through the
+# same expansion process above before turning into a list of arguments.
+mybinary $(get_arguments)
+```
+
+<a id="s6.7.1-arrays-pros"></a>
+
+#### Arrays Pros
+
+*   Using Arrays allows lists of things without confusing quoting
+    semantics. Conversely, not using arrays leads to misguided
+    attempts to nest quoting inside a string.
+*   Arrays make it possible to safely store sequences/lists of
+    arbitrary strings, including strings containing whitespace.
+
+<a id="s6.7.2-arrays-cons"></a>
+
+#### Arrays Cons
+
+Using arrays can risk a script’s complexity growing.
+
+<a id="s6.7.3-arrays-decision"></a>
+
+#### Arrays Decision
+
+Arrays should be used to safely create and pass around lists, at least
+where possible and with good reason. In particular, when building a set
+of command arguments, use arrays to avoid confusing quoting issues. Use
+quoted expansion – `"${array[@]}"` – to access arrays. However, if more
+advanced data manipulation is required, shell scripting should be
+avoided altogether; see [above](#when-to-use-shell).
+
+<a id="s7.8-pipes-to-while"></a>
+
+### Pipes to While
+
+Use process substitution or the `readarray` builtin (bash4+) in preference to
+piping to `while`. Pipes create a subshell, so any variables modified within a
+pipeline do not propagate to the parent shell.
+
+The implicit subshell in a pipe to `while` can introduce subtle bugs that are
+hard to track down.
+
+```bash
+last_line='NULL'
+the_command | while read -r line; do
+    if [[ -n "${line}" ]]; then
+        last_line="${line}"
+    fi
+done
+
+# This will always output 'NULL'!
+echo "${last_line}"
+```
+
+Using process substitution also creates a subshell. However, it allows
+redirecting from a subshell to a `while` without putting the `while` (or any
+other command) in a subshell.
+
+```bash
+last_line='NULL'
+while read line; do
+    if [[ -n "${line}" ]]; then
+        last_line="${line}"
+    fi
+done < <(the_command)
+
+# This will output the last non-empty line from the_command
+echo "${last_line}"
+```
+
+Alternatively, use the `readarray` builtin to read the file into an array, then
+loop over the array's contents. Notice that (for the same reason as above) I
+need to use a process substitution with `readarray` rather than a pipe, but with
+the advantage that the input generation for the loop is located before it,
+rather than after.
+
+```bash
+last_line='NULL'
+readarray -t lines < <(the_command)
+for line in "${lines[@]}"; do
+    if [[ -n "${line}" ]]; then
+        last_line="${line}"
+    fi
+done
+echo "${last_line}"
+```
+
+> Note: Be cautious using a for-loop to iterate over output, as in `for var in
+> $(...)`, as the output is split by whitespace, not by line. Sometimes I will
+> know this is safe because the output can't contain any unexpected whitespace,
+> but where this isn't obvious or doesn't improve readability (such as a long
+> command inside `$(...)`), a `while read` loop or `readarray` is often safer
+> and clearer.
+
+<a id="s7.9-arithmetic"></a>
+
+### Arithmetic
+
+Always use `(( … ))` or `$(( … ))` rather than `let` or `$[ … ]` or
+`expr`.
+
+Never use the `$[ … ]` syntax, the `expr` command (at least for
+arithmetic, sh supports `(( … ))`), or the `let` built-in.
+
+`<` and `>` don't perform numerical comparison inside `[[ … ]]`
+expressions (they perform lexicographical comparisons instead; see
+[Testing Strings](#testing-strings)). For preference, don't use `[[ … ]]`
+*at all* for numeric comparisons, use `(( … ))` instead.
+
+It is recommended to avoid using `(( … ))` as a standalone statement, and
+otherwise be wary of its expression evaluating to zero - particularly with
+`set -e` enabled. For example, `set -e; i=0; (( i++ ))` will cause the
+shell to exit.
+
+```bash
+# Simple calculation used as text - note the use of $(( … )) within
+# a string.
+echo "$(( 2 + 2 )) is 4"
+
+# When performing arithmetic comparisons for testing
+if (( a < b )); then
+  …
+fi
+
+# Some calculation assigned to a variable.
+(( i = 10 * j + 400 ))
+```
+
+```bash
+# This form is non-portable and deprecated
+i=$[2 * 10]
+
+# Despite appearances, 'let' isn't one of the declarative keywords,
+# so unquoted assignments are subject to globbing wordsplitting.
+# For the sake of simplicity, avoid 'let' and use (( … ))
+let i="2 + 2"
+
+# The expr utility is an external program and not a shell builtin.
+i=$( expr 4 + 4 )
+
+# Quoting can be error prone when using expr too.
+i=$( expr 4 '*' 4 )
+```
+
+Stylistic considerations aside, the shell's built-in arithmetic is
+many times faster than `expr`.
+
+When using variables, the `${var}` (and `$var`) forms are not required
+within `$(( … ))`. The shell knows to look up `var` for myself, and
+omitting the `${…}` leads to cleaner code. This is slightly contrary to
+the previous rule about always using braces, so this is a recommendation only.
+
+```bash
+# N.B.: Remember to declare variables as integers when
+# possible, and to prefer local variables over globals.
+local -i hundred=$(( 10 * 10 ))
+declare -i five=$(( 10 / 2 ))
+
+# Increment the variable "i" by three.
+# Note that:
+#  - We do not write ${i} or $i.
+#  - We put a space after the (( and before the )).
+(( i += 3 ))
+
+# To decrement the variable "i" by five:
+(( i -= 5 ))
+
+# Do some complicated computations.
+# Note that normal arithmetic operator precedence is observed.
+hr=2
+min=5
+sec=30
+echo $(( hr * 3600 + min * 60 + sec )) # prints 7530 as expected
+```
+
+<a id="s8-naming-conventions"></a>
+
+## Naming Conventions
+
+<a id="s8.1-function-names"></a>
+
+### Function Names
+
+Lower-case, with underscores to separate words. Separate libraries with
+`::`. Parentheses are required after the function name. Do not use the
+keyword `function` as this is not as portable.
+
+If you're writing single functions, use lowercase and separate words
+with underscore. If you're writing a package, separate package names
+with `::`. Braces must be on the same line as the function
+name (as with other languages at Google) and no space between the
+function name and the parenthesis.
+
+```bash
+# Single function
+my_func() {
+    …
+}
+
+# Part of a package
+mypackage::my_func() {
+    …
+}
+
+# define function with function keyword...DO NOT USE
+function my_func() {
+    …
+}
+```
+
+<a id="s8.2-variable-names"></a>
+
+### Variable Names
+
+As for function names.
+
+Variables names for loops should be similarly named for any variable
+being looping through.
+
+```bash
+for zone in "${zones[@]}"; do
+    something_with "${zone}"
+done
+```
+
+<a id="s8.3-constants-and-environment-variable-names"></a>
+
+### Constants and Environment Variable Names
+
+All caps, separated with underscores, declared at the top of the file/function.
+
+Constants and anything exported to the environment should be
+capitalized. Constants should be anything that is literal,
+that said, PROGRAM_NAME is an exception.
+
+```bash
+# Constant
+readonly PATH_TO_FILES='/some/path'
+
+# Both constant and environment
+declare -xr ORACLE_SID='PROD'
+
+# variable is assigned from literal string
+readonly PROGRAM_NAME="pathjoin"
+
+# same variable but assigned value based on another variable's input
+# will still be capitalized
+readonly PROGRAM_NAME="$(basename "$0")"
+```
+
+<a id="s8.4-source-filenames"></a>
+
+### Source Filenames
+
+Lowercase, with underscores to separate words if desired.
+
+This is for consistency with other code styles in Google:
+`maketemplate` or `make_template` but not
+`make-template`.
+
+<a id="s8.5-read-only-variables"></a>
+
+### Read-only Variables
+
+Use `readonly` or `declare -r` to ensure they're
+read only.
+
+As globals are widely used in shell, it's important to catch errors
+when working with them. When you declare a variable that is meant to
+be read-only, make this explicit.
+
+```bash
+zip_version="$(dpkg --status zip | grep Version: | cut -d ' ' -f 2)"
+if [ -z "${zip_version}" ]; then
+    error_message
+else
+    readonly zip_version
+fi
+```
+
+<a id="s8.6-use-local-variables"></a>
+
+### Use Local Variables
+
+Declare function-specific variables with `local`. Declaration
+and assignment should be on different lines.
+
+Ensure that local variables are only seen inside a function and its
+children by using `local` when declaring them. This avoids
+polluting the global name space and inadvertently setting variables
+that may have significance outside the function.
+
+Declaration and assignment must be separate statements when the
+assignment value is provided by a command substitution; as the
+`local` builtin does not propagate the exit code from the
+command substitution.
+
+```bash
+my_func2() {
+    # BAD
+    local name="$1"
+
+    # Separate lines for declaration and assignment:
+    local my_var
+    my_var="$(my_func)"
+    (( $? == 0 )) || return
+
+    …
+}
+```
+
+```bash
+my_func2() {
+    # DO NOT do this:
+    # $? will always be zero, as it contains the exit code of 'local', not my_func
+    local my_var="$(my_func)"
+    (( $? == 0 )) || return
+
+    …
+}
+```
+
+<a id="s8.7-function-location"></a>
+
+### Function Location
+
+Put all functions together in the file just below constants. Don't hide
+executable code between functions. Doing so makes the code difficult to follow
+and results in nasty surprises when debugging.
+
+If I got functions, put them all together near the top of the
+file. Only sourcing other files, `set` statements and setting constants
+may be done before declaring functions.
+
+<a id="s8.8-main"></a>
+
+### main
+
+A function called `main` is required for scripts long enough
+to contain at least one other function.
+
+In order to easily find the start of the program, put the main program
+in a function called `main` as the bottom most function.
+This provides consistency with the rest of the code base as well as
+allowing myself to define more variables as `local` (which
+can't be done if the main code is not a function). The last
+non-comment line in the file should be a call to `main`:
+
+```bash
+main "$@"
+```
+
+Obviously, for short scripts where it's just a linear flow,
+`main` is overkill and so it is not required.
+
+<a id="s9-calling-commands"></a>
+
+## Calling Commands
+
+<a id="s9.1-checking-return-values"></a>
+
+### Checking Return Values
+
+Always check return values and give informative return values.
+
+For unpiped commands, use `$?` or check directly via an
+`if` statement to keep it simple. That said, checking directly
+via `if` statement is preferred over indirectly.
+
+Example:
+
+```bash
+# preferred
+if ! mv "${file_list[@]}" "${dest_dir}/"; then
+    echo "Unable to move ${file_list[*]} to ${dest_dir}" >&2
+    exit 1
+fi
+
+# not preferred as much (at least according to shellcheck)
+mv "${file_list[@]}" "${dest_dir}/"
+if (( $? != 0 )); then
+    echo "Unable to move ${file_list[*]} to ${dest_dir}" >&2
+    exit 1
+fi
+```
+
+Bash also has the `PIPESTATUS` variable does not exist for sh) that allows
+checking of the return code from all parts of a pipe. If it's only
+necessary to check success or failure of the whole pipe, then the
+following is acceptable:
+
+```bash
+tar -cf - ./* | ( cd "${dir}" && tar -xf - )
+if (( PIPESTATUS[0] != 0 || PIPESTATUS[1] != 0 )); then
+    echo "Unable to tar files to ${dir}" >&2
+fi
+```
+
+However, as `PIPESTATUS` will be overwritten as soon as you
+do any other command, if you need to act differently on errors based
+on where it happened in the pipe, you'll need to assign
+`PIPESTATUS` to another variable immediately after running
+the command (don't forget that `[` is a command and will
+wipe out `PIPESTATUS`).
+
+```bash
+tar -cf - ./* | ( cd "${DIR}" && tar -xf - )
+return_codes=( "${PIPESTATUS[@]}" )
+if (( return_codes[0] != 0 )); then
+    do_something
+fi
+if (( return_codes[1] != 0 )); then
+    do_something_else
+fi
+```
+
+<a id="s9.2-builtin-commands-vs-external-commands"></a>
+
+### Builtin Commands vs. External Commands
+
+Given the choice between invoking a shell builtin and invoking a
+separate process, choose the builtin.
+
+That is, if the builtin is a generic shell builtin. As stated before,
+shell code should be generic where possible. A separate process may
+be necessary.
+
+We prefer the use of builtins such as the *Parameter Expansion*
+functions in `bash(1)` as it's more robust and portable
+(especially when compared to things like `sed`).
+
+Examples:
+
+```bash
+# Prefer this:
+addition=$(( X + Y ))
+substitution="${string/#foo/bar}"
+```
+
+```bash
+# Instead of this:
+addition="$(expr "${X}" + "${Y}")"
+substitution="$(echo "${string}" | sed -e 's/^foo/bar/')"
+```
+
+<a id="s9.3-long-options-over-short-options"></a>
+
+### Long Options Over Short Options
+
+Whenever using a command in a shell script/function, if that command takes
+options, always use long options. Using long options helps the code be
+more readable and can possible give a clue to the reader what the option(s)
+do for said command if they are unfamiliar with the option(s).
+
+Examples:
+
+```bash
+# Do this:
+mkdir --parents "${HOME}"
+ln --symbolic --force "${target}" "./${link_name}"
+```
+
+```bash
+# Don't do this:
+mkdir -p "${HOME}"
+ln -sf "${target}" "./${link_name}"
+```
+
+<a id="s9.4-dependency-checking"></a>
+
+### Dependency Checking
+
+Typically you would have this handle through some form of
+package manager, but lets assume majority of shell scripts/programs
+that are written are standalone.
+
+In this case, the assumption is of currently that any shell code I
+write will be ran on a target system that has access to at least the
+typical `GNU` packages that come with a standard Linux system. This
+means I should not have to check for tools such as `cp`, `mkdir`,
+`basename`, `envsubst`, etc.
+
+Any other dependency should be installed and is assumed to be accessible
+from the path. The following should be used when checking for a dependency
+on the path (is POSIX compliant vs using [which](https://stackoverflow.com/questions/592620/how-can-i-check-if-a-program-exists-from-a-bash-script)):
+
+```bash
+if [ -z "$(command -v jq)" ]; then
+    echo "${PROGRAM_NAME}: jq cannot be found in the PATH!" >&2
+    exit 1
+fi
+```
+
+<a id="s10-conclusion"></a>
+
+## Conclusion
+
+Use common sense and *BE MORE CONSISTENT*.
