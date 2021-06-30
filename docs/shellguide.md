@@ -680,11 +680,12 @@ grep -cP '([Ss]pecial|\|?characters*)$' ${1:+"$1"}
 
 ### CLI (Command Line Interface)
 
-Any shell script should have a ***fully functional*** command line interface
+Any shell executable should have a ***fully functional*** command line interface
 readily available. Shell functions are not expected to have a ***fully functional***
 command line interface, unless this shell function happens to be the
-'main' of the script. In this case, `-h` and `--help` should be implemented
-but not shown as part of the usage string.
+'main' of the script or is meant to be used like a shell script but is
+implemented as a shell function. In this case, `-h` and `--help` should be
+implemented but not shown as part of the usage string.
 
 I prefer having command line interfaces created with both long and
 short options available. `getops` only supports short options while as
@@ -1426,7 +1427,7 @@ ln -sf "${target}" "./${link_name}"
 ### Dependency Checking
 
 Typically you would have this handle through some form of
-package manager, but lets assume majority of shell scripts/programs
+package manager, but lets assume majority of shell scripts/functions
 that are written are standalone.
 
 In this case, the assumption is of currently that any shell code I
