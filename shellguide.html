@@ -723,11 +723,12 @@ grep -cP '([Ss]pecial|\|?characters*)$' ${1:+&quot;$1&quot;}
 </code></pre>
 <p><a id="s6.8-cli"></a></p>
 <h3 id="cli-command-line-interface">CLI (Command Line Interface)</h3>
-<p>Any shell script should have a <strong><em>fully functional</em></strong> command line interface
+<p>Any shell executable should have a <strong><em>fully functional</em></strong> command line interface
 readily available. Shell functions are not expected to have a <strong><em>fully functional</em></strong>
 command line interface, unless this shell function happens to be the
-'main' of the script. In this case, <code>-h</code> and <code>--help</code> should be implemented
-but not shown as part of the usage string.</p>
+'main' of the script or is meant to be used like a shell script but is
+implemented as a shell function. In this case, <code>-h</code> and <code>--help</code> should be
+implemented but not shown as part of the usage string.</p>
 <p>I prefer having command line interfaces created with both long and
 short options available. <code>getops</code> only supports short options while as
 <code>getopt</code> supports both. So when given the choice use getopt, and if for
@@ -1281,7 +1282,7 @@ ln -sf &quot;${target}&quot; &quot;./${link_name}&quot;
 <p><a id="s9.4-dependency-checking"></a></p>
 <h3 id="dependency-checking">Dependency Checking</h3>
 <p>Typically you would have this handle through some form of
-package manager, but lets assume majority of shell scripts/programs
+package manager, but lets assume majority of shell scripts/functions
 that are written are standalone.</p>
 <p>In this case, the assumption is of currently that any shell code I
 write will be ran on a target system that has access to at least the
