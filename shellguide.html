@@ -298,8 +298,21 @@ program or to use a function in my library by reading the comments
 <ul>
 <li>Description of the function.</li>
 <li>Globals: List of global variables used and/or modified. (default if not listed, <strong>None</strong>)</li>
-<li>Arguments: Arguments taken. (default if not listed, <strong>None</strong>)</li>
-<li>Outputs: Output to STDOUT or STDERR. (default if not listed, <strong>None</strong>)</li>
+<li>Arguments: Arguments taken. (default if not listed, <strong>None</strong>)<ul>
+<li>Arguments in this case are the <strong>operands</strong> to the command. Option arguments
+    should already been in the <strong><em><code>usage</code></em></strong> string. So do not document the option
+    and (if applicable) the option argument in the function comment.</li>
+<li>Going based off of the POSIX Standard's 'Utility Conventions' for the word
+    <a href="https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html">operand</a>.</li>
+</ul>
+</li>
+<li>Outputs: Output to STDOUT or STDERR. (default if not listed, <strong>None</strong>)<ul>
+<li>Judiciously write about the output expected. Aka, typical Unix commands
+    can mostly be assumed to generate some form of output to stdout/stderr.</li>
+<li>Despite the arguments not including any mention of the CLI, do make a mention
+    here if either a bare/fully functional CLI will be any part of stdout.</li>
+</ul>
+</li>
 <li>Returns: Returned values other than the exit/return code of commands.<ul>
 <li>Even if there is a slight chance that a command might return the exit
     code of a hardcoded exit code, I can assume it should mostly be the hardcoded
@@ -332,12 +345,15 @@ get_dir() {
 }
 
 #######################################
-# Gets a file based on the url.
+# Gets a file based on the url, also outputs
+# name of the current user using the shell
+# session.
 # Globals:
 #   PROGRAM_NAME
 # Outputs:
-#   - Command errors to stderr (e.g. wget &quot;$1&quot;)
-#   - Custom errors to stderr (e.g. echo &quot;${PROGRAM_NAME}:...&quot;)
+#   - Writes name of the current user to stdout
+#   - Writes wget not being found in the PATH to stderr (Custom messages to stdout/stderr)
+#   - &quot;wget&quot; command output to stdout/stderr (Command messages to stdout/stderr)
 # Returns:
 #   - 0: success
 #   - 1: wget is not in the path
@@ -347,6 +363,7 @@ get_file() {
         echo &quot;${PROGRAM_NAME}: wget cannot be found in the PATH!&quot; &gt;&amp;2
         return 1
     wget &quot;$1&quot;
+    echo &quot;$(basename /home/&quot;${USER}&quot;)&quot;
     return # should return exit status of wget
 }
 
@@ -354,9 +371,9 @@ get_file() {
 # Removes a file, echos a file, and creates
 # numerous files.
 # Arguments:
-#   $1: A file path to delete.
-#   $2: A file path to echo.
-#   $n: File names to create.
+#   $1: A file path to delete
+#   $2: A file path to echo
+#   $n: File names to create
 #######################################
 do_things() {
     rm &quot;$1&quot;; shift
@@ -370,18 +387,24 @@ do_things() {
 #######################################
 # Removes a file from the system.
 # Arguments:
-#   -h/--help: show help message and exit.
-#   $1: A file path to delete.
+#   $1: A file path to delete
 #######################################
 del_thing() {
     # constants and defined cli parameters, opt ==&gt; option
+    local PROGRAM_NAME
     readonly PROGRAM_NAME=&quot;del_thing&quot;
+
+    local HELP_SHORT_OPT
     readonly HELP_SHORT_OPT=&quot;h&quot;
+
+    local HELP_LONG_OPT
     readonly HELP_LONG_OPT=&quot;help&quot;
 
-    short_opts=&quot;${HELP_SHORT_OPT}&quot;
-    path_prefix=&quot;/&quot;
-    help_option=false
+    local short_opts=&quot;${HELP_SHORT_OPT}&quot;
+    readonly short_opts
+
+    local path_prefix=&quot;/&quot;
+    local help_option=false
     # do not combine long opts into their own variable
     eval set -- &quot;$(getopt --options &quot;${short_opts}&quot; --long &quot;${HELP_LONG_OPT}&quot; --name &quot;${PROGRAM_NAME}&quot; -- &quot;$@&quot;)&quot;
     …
@@ -723,25 +746,28 @@ grep -cP '([Ss]pecial|\|?characters*)$' ${1:+&quot;$1&quot;}
 </code></pre>
 <p><a id="s6.8-cli"></a></p>
 <h3 id="cli-command-line-interface">CLI (Command Line Interface)</h3>
-<p>Any shell executable should have a <strong><em>fully functional</em></strong> command line interface
-readily available. Shell functions are not expected to have a <strong><em>fully functional</em></strong>
-command line interface, unless this shell function happens to be the
-'main' of the script or is meant to be used like a shell script but is
-implemented as a shell function. In this case, <code>-h</code> and <code>--help</code> should be
-implemented but not shown as part of the usage string.</p>
+<p>Any shell executable/function should have a command line interface
+readily available. This only applies to shell functions that do not have
+an underscore as the prefix (or the first) character (e.g. <code>_func</code>). Functions with the
+underscore as a prefix are assumed to be helper functions.</p>
+<p>Command line interfaces can either be <strong><em>fully functional</em></strong> or <strong><em>bare</em></strong>.
+Fully functional command line interfaces take numerous options and/or option
+arguments, also covering the options in a bare command line interface. In
+bare command line interfaces, only <code>-h</code> and <code>--help</code> should be implemented
+but not shown as part of the usage string.</p>
 <p>I prefer having command line interfaces created with both long and
 short options available. <code>getops</code> only supports short options while as
 <code>getopt</code> supports both. So when given the choice use getopt, and if for
 some reason getopt is not available then getopts will work in a pinch
 (<a href="https://stackoverflow.com/questions/402377/using-getopts-to-process-long-and-short-command-line-options">reference</a>).</p>
-<p>Example (getopt/getops examples already exist in the document):</p>
+<p>Example (getopt/getops examples already exist in the document, example of bare CLI):</p>
 <pre><code class="language-bash"># NOTE(cavcrosby): this is to encourage the notion that this will not have a fully
 # functional CLI (e.g. ./PROGRAM_NAME -f foo -b bar)
 if [ &quot;$1&quot; = &quot;-h&quot; ] || [ &quot;$1&quot; = &quot;--help&quot; ]; then
     cat &lt;&lt; _EOF_
 Usage: ${PROGRAM_NAME}
 
-This program goes foo. This program does not plan on having a functional
+This program does not plan on having a fully functional 
 command line interface (CLI).
 
 _EOF_
@@ -1098,6 +1124,22 @@ function my_func() {
 </code></pre>
 <p><a id="s8.2-variable-names"></a></p>
 <h3 id="variable-names">Variable Names</h3>
+<p>A lot of variables I use are to denote file/directory names. So it can
+be assumed that variables denoting a dir or file in its name will be the
+actual name of the dir or file.</p>
+<p>Anything else can also be assumed to be the name of some 'object' (OOP is not
+a feature in POSIX shell). Any other characteristic that a variable is
+trying to convey should have that appended to its name.</p>
+<pre><code class="language-bash">#   SHELL_PROVISIONERS_CONFIG_FILE          (from .env)
+#   PROJECT_SCRIPTS_DIR_PATH                (from .env)
+#   PACKER_EXE_PATH                         (from .env)
+#   ISO_IMAGES_PATH                         (from .env)
+#   PACKER_HTTP_DIR                         (from .env)
+#   PACKER_HTTP_DIR_MODE                    (from .env)
+#   PACKER_SHELL_PROVISIONERS_DIR           (from .env)
+#   SHELL_PREPROCESSOR                      (from Jenkins parameters)
+#   BUILD_TYPE                              (from Jenkins parameters)
+</code></pre>
 <p>As for function names.</p>
 <p>Variables names for loops should be similarly named for any variable
 being looping through.</p>
