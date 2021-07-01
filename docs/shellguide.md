@@ -172,7 +172,16 @@ All function comments should describe the intended API behaviour using (and in t
 *   Description of the function.
 *   Globals: List of global variables used and/or modified. (default if not listed, **None**)
 *   Arguments: Arguments taken. (default if not listed, **None**)
+    *   Arguments in this case are the **operands** to the command. Option arguments
+        should already been in the ***`usage`*** string. So do not document the option
+        and (if applicable) the option argument in the function comment.
+    *   Going based off of the POSIX Standard's 'Utility Conventions' for the word
+        [operand](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap12.html).
 *   Outputs: Output to STDOUT or STDERR. (default if not listed, **None**)
+    *   Judiciously write about the output expected. Aka, typical Unix commands
+        can mostly be assumed to generate some form of output to stdout/stderr.
+    *   Despite the arguments not including any mention of the CLI, do make a mention
+        here if either a bare/fully functional CLI will be any part of stdout.
 *   Returns: Returned values other than the exit/return code of commands.
     *   Even if there is a slight chance that a command might return the exit
         code of a hardcoded exit code, I can assume it should mostly be the hardcoded
@@ -206,12 +215,15 @@ get_dir() {
 }
 
 #######################################
-# Gets a file based on the url.
+# Gets a file based on the url, also outputs
+# name of the current user using the shell
+# session.
 # Globals:
 #   PROGRAM_NAME
 # Outputs:
-#   - Command errors to stderr (e.g. wget "$1")
-#   - Custom errors to stderr (e.g. echo "${PROGRAM_NAME}:...")
+#   - Writes name of the current user to stdout
+#   - Writes wget not being found in the PATH to stderr (Custom messages to stdout/stderr)
+#   - "wget" command output to stdout/stderr (Command messages to stdout/stderr)
 # Returns:
 #   - 0: success
 #   - 1: wget is not in the path
@@ -221,6 +233,7 @@ get_file() {
         echo "${PROGRAM_NAME}: wget cannot be found in the PATH!" >&2
         return 1
     wget "$1"
+    echo "$(basename /home/"${USER}")"
     return # should return exit status of wget
 }
 
@@ -228,9 +241,9 @@ get_file() {
 # Removes a file, echos a file, and creates
 # numerous files.
 # Arguments:
-#   $1: A file path to delete.
-#   $2: A file path to echo.
-#   $n: File names to create.
+#   $1: A file path to delete
+#   $2: A file path to echo
+#   $n: File names to create
 #######################################
 do_things() {
     rm "$1"; shift
@@ -244,18 +257,24 @@ do_things() {
 #######################################
 # Removes a file from the system.
 # Arguments:
-#   -h/--help: show help message and exit.
-#   $1: A file path to delete.
+#   $1: A file path to delete
 #######################################
 del_thing() {
     # constants and defined cli parameters, opt ==> option
+    local PROGRAM_NAME
     readonly PROGRAM_NAME="del_thing"
+    
+    local HELP_SHORT_OPT
     readonly HELP_SHORT_OPT="h"
+
+    local HELP_LONG_OPT
     readonly HELP_LONG_OPT="help"
 
-    short_opts="${HELP_SHORT_OPT}"
-    path_prefix="/"
-    help_option=false
+    local short_opts="${HELP_SHORT_OPT}"
+    readonly short_opts
+
+    local path_prefix="/"
+    local help_option=false
     # do not combine long opts into their own variable
     eval set -- "$(getopt --options "${short_opts}" --long "${HELP_LONG_OPT}" --name "${PROGRAM_NAME}" -- "$@")"
     …
@@ -680,12 +699,16 @@ grep -cP '([Ss]pecial|\|?characters*)$' ${1:+"$1"}
 
 ### CLI (Command Line Interface)
 
-Any shell executable should have a ***fully functional*** command line interface
-readily available. Shell functions are not expected to have a ***fully functional***
-command line interface, unless this shell function happens to be the
-'main' of the script or is meant to be used like a shell script but is
-implemented as a shell function. In this case, `-h` and `--help` should be
-implemented but not shown as part of the usage string.
+Any shell executable/function should have a command line interface
+readily available. This only applies to shell functions that do not have
+an underscore as the prefix (or the first) character (e.g. `_func`). Functions with the
+underscore as a prefix are assumed to be helper functions.
+
+Command line interfaces can either be ***fully functional*** or ***bare***.
+Fully functional command line interfaces take numerous options and/or option
+arguments, also covering the options in a bare command line interface. In
+bare command line interfaces, only `-h` and `--help` should be implemented
+but not shown as part of the usage string.
 
 I prefer having command line interfaces created with both long and
 short options available. `getops` only supports short options while as
@@ -693,7 +716,7 @@ short options available. `getops` only supports short options while as
 some reason getopt is not available then getopts will work in a pinch
 ([reference](https://stackoverflow.com/questions/402377/using-getopts-to-process-long-and-short-command-line-options)).
 
-Example (getopt/getops examples already exist in the document):
+Example (getopt/getops examples already exist in the document, example of bare CLI):
 
 ```bash
 # NOTE(cavcrosby): this is to encourage the notion that this will not have a fully
@@ -702,7 +725,7 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     cat << _EOF_
 Usage: ${PROGRAM_NAME}
 
-This program goes foo. This program does not plan on having a functional
+This program does not plan on having a fully functional 
 command line interface (CLI).
 
 _EOF_
@@ -1167,6 +1190,26 @@ function my_func() {
 <a id="s8.2-variable-names"></a>
 
 ### Variable Names
+
+A lot of variables I use are to denote file/directory names. So it can
+be assumed that variables denoting a dir or file in its name will be the
+actual name of the dir or file.
+
+Anything else can also be assumed to be the name of some 'object' (OOP is not
+a feature in POSIX shell). Any other characteristic that a variable is
+trying to convey should have that appended to its name.
+
+```bash
+#   SHELL_PROVISIONERS_CONFIG_FILE          (from .env)
+#   PROJECT_SCRIPTS_DIR_PATH                (from .env)
+#   PACKER_EXE_PATH                         (from .env)
+#   ISO_IMAGES_PATH                         (from .env)
+#   PACKER_HTTP_DIR                         (from .env)
+#   PACKER_HTTP_DIR_MODE                    (from .env)
+#   PACKER_SHELL_PROVISIONERS_DIR           (from .env)
+#   SHELL_PREPROCESSOR                      (from Jenkins parameters)
+#   BUILD_TYPE                              (from Jenkins parameters)
+```
 
 As for function names.
 
