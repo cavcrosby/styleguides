@@ -8,7 +8,7 @@ Section                                                                         
 [Shell Files and Interpreter Invocation](#s2-shell-files-and-interpreter-invocation) | [File Extensions](#s2.1-file-extensions) - [SUID/SGID](#s2.2-suid-sgid)
 [Environment](#s3-environment)                                                       | [STDOUT vs STDERR](#s3.1-stdout-vs-stderr)
 [Comments](#s4-comments)                                                             | [File Header](#s4.1-file-header) - [Function Comments](#s4.2-function-comments) - [Implementation Comments](#s4.3-implementation-comments)
-[Comment Tags](#s5-comment-tags)                                                     | [TODO Comments](#s5.1-todo-tags) - [NOTE Comments](#s5.2-note-tags) - [NOTES Comments](#s5.3-notes-tags) - [DISCUSS Comments](#s5.4-discuss-tags)
+[Comment Tags](#s5-task-tags)                                                     | [TODO Tags](#s5.1-todo-tags) - [DISCUSS Tags](#s5.2-discuss-tags)
 [Formatting](#s6-formatting)                                                         | [Indentation](#s6.1-indentation) - [Line Length and Long Strings](#s6.2-line-length-and-long-strings) - [Pipelines](#s6.3-pipelines) - [Loops](#s6.4-loops) - [Case statement](#s6.5-case-statement) - [Variable expansion](#s6.6-variable-expansion) - [Quoting](#s6.7-quoting) - [CLI](#s6.8-cli)
 [Features and Bugs](#s7-features-and-bugs)                                           |    [ShellCheck](#s7.1-shellcheck) - [Command Substitution](#s7.2-command-substitution) - [Test, [… ], and [[… ]]](#s7.3-tests) - [Testing Strings](#s7.4-testing-strings) - [Wildcard Expansion of Filenames](#s7.5-wildcard-expansion-of-filenames) - [Eval](#s7.6-eval) - [Arrays](#s7.7-arrays) - [Pipes to While](#s7.8-pipes-to-while) - [Arithmetic](#s7.9-arithmetic)
 [Naming Conventions](#s8-naming-conventions)                                         | [Function Names](#s8.1-function-names) - [Variable Names](#s8.2-variable-names) - [Constants and Environment Variable Names](#s8.3-constants-and-environment-variable-names) - [Source Filenames](#s8.4-source-filenames) - [Read-only Variables](#s8.5-read-only-variables) - [Use Local Variables](#s8.6-use-local-variables) - [Function Location](#s8.7-function-location) - [main](#s8.8-main)
@@ -292,14 +292,18 @@ This follows general Google coding comment practice. Don't comment
 everything. If there's a complex algorithm or you're doing something
 out of the ordinary, put a short comment in.
 
+Fairly non-complete sentences that do not extend past one line do not need
+to follow normal capitalization/punctuation rules. `TODO` task tags sentences
+do not need to follow this as much considering they should be temporary anyways.
+
 <a id="s5-comment-tags"></a>
 
-## Comment Tags
+## Task Tags
 
-Below are the formats for comment tags that should be used throughout the
+Below are the formats for task tags that should be used throughout the
 shell code. All tags should have their respective name in all caps, followed
 by the name ***`cavcrosby`***. The main purpose of this is to have consistent
-comment tags across my shell code that can be searched.
+task tags across my shell code that can be searched.
 
 <a id="s5.1-todo-tags"></a>
 
@@ -315,38 +319,7 @@ Examples:
 # TODO(cavcrosby): need to implement new option to allow easier convenience
 ```
 
-<a id="s5.2-note-tags"></a>
-
-### NOTE Tags
-
-`NOTE` tags/comments be used to denote comments that should gartner a bit
-more attention than a typical code comment. NOTE comment should be less
-than 2 sentences and does not end with a period. The first word in a NOTE
-comment (after NOTE:) does not have its first letter capitalized.
-
-Examples:
-
-```bash
-# NOTE(cavcrosby): currently used because foo is not available on all systems
-```
-
-<a id="s5.3-notes-tags"></a>
-
-### NOTES Tags
-
-`NOTES` tags/comments are the same as `NOTE` comments, but are at least 2 sentences.
-They may be used more to elaborate about the reasoning behind the
-implementation of the code that they are next to. That said, they shouldn't
-be of great lengths. At the moment the max is roughly 5 sentences.
-
-Examples:
-
-```bash
-# NOTES(cavcrosby): currently used because foo is not available on all systems.
-# For now bar will be used in foo's place.
-```
-
-<a id="s5.4-discuss-tags"></a>
+<a id="s5.2-discuss-tags"></a>
 
 ### DISCUSS Tags
 
@@ -703,6 +676,8 @@ Any shell executable/function should have a command line interface
 readily available. This only applies to shell functions that do not have
 an underscore as the prefix (or the first) character (e.g. `_func`). Functions with the
 underscore as a prefix are assumed to be helper functions.
+    *   Helper functions are not expected to have PROGRAM_NAME constant either, but
+        instead to piggyback on a 'main' PROGRAM_NAME.
 
 Command line interfaces can either be ***fully functional*** or ***bare***.
 Fully functional command line interfaces take numerous options and/or option
@@ -719,8 +694,8 @@ some reason getopt is not available then getopts will work in a pinch
 Example (getopt/getops examples already exist in the document, example of bare CLI):
 
 ```bash
-# NOTE(cavcrosby): this is to encourage the notion that this will not have a fully
-# functional CLI (e.g. ./PROGRAM_NAME -f foo -b bar)
+# This is to encourage the notion that this will not have a fully functional
+# CLI (e.g. ./PROGRAM_NAME -f foo -b bar).
 if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     cat << _EOF_
 Usage: ${PROGRAM_NAME}
