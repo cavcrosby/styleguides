@@ -30,7 +30,7 @@ help:
 >	@echo '  test         - launches a web server with the project site'
 >	@echo '  deploy       - deploys the project site to a GitHub Pages branch'
 >	@echo '  clean        - remove files created by other targets'
->	@echo 'Target configurations (e.g. make [config]=1 [targets]):'
+>	@echo 'Public make configurations (e.g. make [config]=1 [targets]):'
 >	@echo '  message      - commit message to use when deploying to a GitHub'
 >	@echo '                 Pages branch'
 
