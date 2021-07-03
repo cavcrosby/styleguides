@@ -105,7 +105,7 @@
               <ul class="nav flex-column">
               </ul>
             </li>
-            <li class="nav-item" data-level="2"><a href="#comment-tags" class="nav-link">Comment Tags</a>
+            <li class="nav-item" data-level="2"><a href="#task-tags" class="nav-link">Task Tags</a>
               <ul class="nav flex-column">
               </ul>
             </li>
@@ -163,8 +163,8 @@
 <td><a href="#s4.1-file-header">File Header</a> - <a href="#s4.2-function-comments">Function Comments</a> - <a href="#s4.3-implementation-comments">Implementation Comments</a></td>
 </tr>
 <tr>
-<td><a href="#s5-comment-tags">Comment Tags</a></td>
-<td><a href="#s5.1-todo-tags">TODO Comments</a> - <a href="#s5.2-note-tags">NOTE Comments</a> - <a href="#s5.3-notes-tags">NOTES Comments</a> - <a href="#s5.4-discuss-tags">DISCUSS Comments</a></td>
+<td><a href="#s5-task-tags">Comment Tags</a></td>
+<td><a href="#s5.1-todo-tags">TODO Tags</a> - <a href="#s5.2-discuss-tags">DISCUSS Tags</a></td>
 </tr>
 <tr>
 <td><a href="#s6-formatting">Formatting</a></td>
@@ -417,12 +417,15 @@ code.</p>
 <p>This follows general Google coding comment practice. Don't comment
 everything. If there's a complex algorithm or you're doing something
 out of the ordinary, put a short comment in.</p>
+<p>Fairly non-complete sentences that do not extend past one line do not need
+to follow normal capitalization/punctuation rules. <code>TODO</code> task tags sentences
+do not need to follow this as much considering they should be temporary anyways.</p>
 <p><a id="s5-comment-tags"></a></p>
-<h2 id="comment-tags">Comment Tags</h2>
-<p>Below are the formats for comment tags that should be used throughout the
+<h2 id="task-tags">Task Tags</h2>
+<p>Below are the formats for task tags that should be used throughout the
 shell code. All tags should have their respective name in all caps, followed
 by the name <strong><em><code>cavcrosby</code></em></strong>. The main purpose of this is to have consistent
-comment tags across my shell code that can be searched.</p>
+task tags across my shell code that can be searched.</p>
 <p><a id="s5.1-todo-tags"></a></p>
 <h3 id="todo-tags">TODO Tags</h3>
 <p>Use <code>TODO</code> tags/comments for code that is temporary, a short-term solution, or
@@ -431,26 +434,7 @@ fix the problem. At least not immediately.</p>
 <p>Examples:</p>
 <pre><code class="language-bash"># TODO(cavcrosby): need to implement new option to allow easier convenience
 </code></pre>
-<p><a id="s5.2-note-tags"></a></p>
-<h3 id="note-tags">NOTE Tags</h3>
-<p><code>NOTE</code> tags/comments be used to denote comments that should gartner a bit
-more attention than a typical code comment. NOTE comment should be less
-than 2 sentences and does not end with a period. The first word in a NOTE
-comment (after NOTE:) does not have its first letter capitalized.</p>
-<p>Examples:</p>
-<pre><code class="language-bash"># NOTE(cavcrosby): currently used because foo is not available on all systems
-</code></pre>
-<p><a id="s5.3-notes-tags"></a></p>
-<h3 id="notes-tags">NOTES Tags</h3>
-<p><code>NOTES</code> tags/comments are the same as <code>NOTE</code> comments, but are at least 2 sentences.
-They may be used more to elaborate about the reasoning behind the
-implementation of the code that they are next to. That said, they shouldn't
-be of great lengths. At the moment the max is roughly 5 sentences.</p>
-<p>Examples:</p>
-<pre><code class="language-bash"># NOTES(cavcrosby): currently used because foo is not available on all systems.
-# For now bar will be used in foo's place.
-</code></pre>
-<p><a id="s5.4-discuss-tags"></a></p>
+<p><a id="s5.2-discuss-tags"></a></p>
 <h3 id="discuss-tags">DISCUSS Tags</h3>
 <p><code>DISCUSS</code> tags/comments are reversed for areas in code that still need
 to be thought out/researched before implementation or there may be code
@@ -749,7 +733,9 @@ grep -cP '([Ss]pecial|\|?characters*)$' ${1:+&quot;$1&quot;}
 <p>Any shell executable/function should have a command line interface
 readily available. This only applies to shell functions that do not have
 an underscore as the prefix (or the first) character (e.g. <code>_func</code>). Functions with the
-underscore as a prefix are assumed to be helper functions.</p>
+underscore as a prefix are assumed to be helper functions.
+    *   Helper functions are not expected to have PROGRAM_NAME constant either, but
+        instead to piggyback on a 'main' PROGRAM_NAME.</p>
 <p>Command line interfaces can either be <strong><em>fully functional</em></strong> or <strong><em>bare</em></strong>.
 Fully functional command line interfaces take numerous options and/or option
 arguments, also covering the options in a bare command line interface. In
@@ -761,8 +747,8 @@ short options available. <code>getops</code> only supports short options while a
 some reason getopt is not available then getopts will work in a pinch
 (<a href="https://stackoverflow.com/questions/402377/using-getopts-to-process-long-and-short-command-line-options">reference</a>).</p>
 <p>Example (getopt/getops examples already exist in the document, example of bare CLI):</p>
-<pre><code class="language-bash"># NOTE(cavcrosby): this is to encourage the notion that this will not have a fully
-# functional CLI (e.g. ./PROGRAM_NAME -f foo -b bar)
+<pre><code class="language-bash"># This is to encourage the notion that this will not have a fully functional
+# CLI (e.g. ./PROGRAM_NAME -f foo -b bar).
 if [ &quot;$1&quot; = &quot;-h&quot; ] || [ &quot;$1&quot; = &quot;--help&quot; ]; then
     cat &lt;&lt; _EOF_
 Usage: ${PROGRAM_NAME}
