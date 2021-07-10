@@ -265,10 +265,7 @@ which is why I am being explicit about banning it.</p>
 <h3 id="stdout-vs-stderr">STDOUT vs STDERR</h3>
 <p>All error messages should go to <code>STDERR</code>.</p>
 <p>This makes it easier to separate normal status from actual issues.</p>
-<p>Currently while my <strong>dotfiles</strong> do include ANSI escape color sequences for
-status messages, unless the project the shell code is in also includes
-the ANSI escape color sequences, it is advised to use the following below
-as the format for messages to stderr.</p>
+<p>It is advised to use the following below as the format for messages to STDERR.</p>
 <pre><code class="language-bash">if [ -z &quot;$(command -v git)&quot; ]; then
     echo &quot;${PROGRAM_NAME}: git cannot be found in the PATH!&quot; &gt;&amp;2
     exit 1
@@ -281,8 +278,8 @@ fi
 <p>Start each file with a description of its contents.</p>
 <p>Every file must have a top-level comment including a brief overview of
 its contents. *.conf, *.cfg, *.env (or any other named variant, e.g.
-*.test_env) files should also contain this header, just without the
-shabang line.</p>
+*.test_env), and shell related dotfiles should also contain this header,
+just without the shabang line.</p>
 <p>Example:</p>
 <pre><code class="language-bash">#!/bin/bash
 #
@@ -308,20 +305,18 @@ program or to use a function in my library by reading the comments
 </li>
 <li>Outputs: Output to STDOUT or STDERR. (default if not listed, <strong>None</strong>)<ul>
 <li>Judiciously write about the output expected. Aka, typical Unix commands
-    can mostly be assumed to generate some form of output to stdout/stderr.</li>
+    can mostly be assumed to generate some form of output to STDOUT/STDERR.</li>
 <li>Despite the arguments not including any mention of the CLI, do make a mention
-    here if either a bare/fully functional CLI will be any part of stdout.</li>
+    here if either a bare/fully functional CLI will be any part of STDOUT.</li>
 </ul>
 </li>
 <li>Returns: Returned values other than the exit/return code of commands.<ul>
 <li>Even if there is a slight chance that a command might return the exit
-    code of a hardcoded exit code, I can assume it should mostly be the hardcoded
-    status code that is returned.</li>
+    code of a hardcoded exit code (applies if <code>set -e</code> is set), I can assume
+    it should mostly be the hardcoded status code that is returned.</li>
 </ul>
 </li>
 </ul>
-<p>If a function also serves a CLI, then the CLI options should also be
-account for in the 'Arguments' section of a function.</p>
 <p>Examples:</p>
 <pre><code class="language-bash">#######################################
 # Cleanup files from the backup directory.
@@ -363,8 +358,8 @@ get_file() {
         echo &quot;${PROGRAM_NAME}: wget cannot be found in the PATH!&quot; &gt;&amp;2
         return 1
     wget &quot;$1&quot;
-    echo &quot;$(basename /home/&quot;${USER}&quot;)&quot;
-    return # should return exit status of wget
+    echo &quot;$(basename &quot;/home/${USER}&quot;)&quot;
+    return 0
 }
 
 #######################################
@@ -382,6 +377,7 @@ do_things() {
         touch &quot;$1&quot;
         shift
     done
+    return 0
 }
 
 #######################################
@@ -390,7 +386,7 @@ do_things() {
 #   $1: A file path to delete
 #######################################
 del_thing() {
-    # constants and defined cli parameters, opt ==&gt; option
+    # constants and defined cli parameters
     local PROGRAM_NAME
     readonly PROGRAM_NAME=&quot;del_thing&quot;
 
@@ -418,7 +414,7 @@ code.</p>
 everything. If there's a complex algorithm or you're doing something
 out of the ordinary, put a short comment in.</p>
 <p>Fairly non-complete sentences that do not extend past one line do not need
-to follow normal capitalization/punctuation rules. <code>TODO</code> task tags sentences
+to follow normal capitalization/punctuation rules. Task tags sentences
 do not need to follow this as much considering they should be temporary anyways.</p>
 <p><a id="s5-comment-tags"></a></p>
 <h2 id="task-tags">Task Tags</h2>
@@ -574,7 +570,7 @@ while getopts 'abf:v' flag; do
 done
 </code></pre>
 <pre><code class="language-bash"># short/long option processing
-# constants and defined cli parameters, opt ==&gt; option
+# constants and defined cli parameters
 readonly PROGRAM_NAME=&quot;foo&quot;
 readonly HELP_SHORT_OPT=&quot;h&quot;
 readonly HELP_LONG_OPT=&quot;help&quot;
@@ -582,6 +578,7 @@ readonly HELP_LONG_OPT=&quot;help&quot;
 short_opts=&quot;${HELP_SHORT_OPT}&quot;
 path_prefix=&quot;/&quot;
 help_option=false
+
 # do not combine long opts into their own variable
 eval set -- &quot;$(getopt --options &quot;${short_opts}&quot; --long &quot;${HELP_LONG_OPT}&quot; --name &quot;${PROGRAM_NAME}&quot; -- &quot;$@&quot;)&quot;
 while true; do
@@ -679,7 +676,7 @@ mybinary &quot;${FLAGS[@]}&quot;
 
 # It's ok to not quote internal integer variables.
 if (( $# &gt; 3 )); then
-  echo &quot;ppid=${PPID}&quot;
+    echo &quot;ppid=${PPID}&quot;
 fi
 
 # &quot;never quote literal integers&quot;
@@ -799,13 +796,13 @@ fi
 # This matches the exact pattern &quot;f*&quot; (Does not match in this case)
 # ...to be fair this is harder to read
 if [ &quot;$(echo &quot;filename&quot; | grep --extended-regexp '\&quot;f*\&quot;' --count)&quot; -gt 0 ]; then
-  echo &quot;Match&quot;
+    echo &quot;Match&quot;
 fi
 </code></pre>
 <pre><code class="language-bash"># This gives a &quot;too many arguments&quot; error as f* is expanded to the
 # contents of the current directory
 if [ &quot;filename&quot; == f* ]; then
-  echo &quot;Match&quot;
+    echo &quot;Match&quot;
 fi
 </code></pre>
 <p>For the gory details, see E14 at http://tiswww.case.edu/php/chet/bash/FAQ</p>
@@ -845,10 +842,9 @@ if [ &quot;${my_var}&quot; ]; then
 fi
 </code></pre>
 <p>While <code>==</code> is easier to read, '=' is the preferred operator for equality.
-Despite the fact '=' is also an assignment operator elsewhere.
-However, be careful when using <code>&lt;</code> and <code>&gt;</code>
-in <code>[[ … ]]</code> which performs a lexicographical comparison.
-Use <code>(( … ))</code> or <code>-lt</code> and <code>-gt</code> for
+Despite the fact '=' is also an assignment operator elsewhere. However, be
+careful when using <code>&lt;</code> and <code>&gt;</code> in <code>[[ … ]]</code> which performs a 
+lexicographical comparison. Use <code>(( … ))</code> or <code>-lt</code> and <code>-gt</code> for
 numerical comparison.</p>
 <pre><code class="language-bash"># Use this
 if [ &quot;${my_var}&quot; = &quot;val&quot; ]; then
@@ -873,7 +869,7 @@ fi
 <h3 id="wildcard-expansion-of-filenames">Wildcard Expansion of Filenames</h3>
 <p>Use an explicit path when doing wildcard expansion of filenames.</p>
 <p>As filenames can begin with a <code>-</code>, it's a lot safer to
-expand wildcards with <code>./*</code> instead of <code>*</code>.</p>
+expand wildcards with <code>${PWD}/*</code> instead of <code>*</code>.</p>
 <pre><code class="language-bash"># Here's the contents of the directory:
 # -f  -r  somedir  somefile
 
@@ -883,11 +879,11 @@ removed directory: `somedir'
 removed `somefile'
 </code></pre>
 <pre><code class="language-bash"># As opposed to:
-psa@bilby$ rm -v ./*
-removed `./-f'
-removed `./-r'
-rm: cannot remove `./somedir': Is a directory
-removed `./somefile'
+psa@bilby$ rm -v ${PWD}/*
+removed `${PWD}/-f'
+removed `${PWD}/-r'
+rm: cannot remove `${PWD}/somedir': Is a directory
+removed `${PWD}/somefile'
 </code></pre>
 <p><a id="s7.6-eval"></a></p>
 <h3 id="eval">Eval</h3>
@@ -1116,6 +1112,10 @@ actual name of the dir or file.</p>
 <p>Anything else can also be assumed to be the name of some 'object' (OOP is not
 a feature in POSIX shell). Any other characteristic that a variable is
 trying to convey should have that appended to its name.</p>
+<p>Abbreviations for variable names are ok, as long as it is discernable what that
+abbreviation actually means (e.g. dir, prog, opt). Generally this is ok for code,
+but for any output to a end user should use full words. If a variable name requires
+a comment (e.g. <code>p # pointer to foo</code>), then the abbreviation should not be used.</p>
 <pre><code class="language-bash">#   SHELL_PROVISIONERS_CONFIG_FILE          (from .env)
 #   PROJECT_SCRIPTS_DIR_PATH                (from .env)
 #   PACKER_EXE_PATH                         (from .env)
@@ -1137,19 +1137,19 @@ done
 <h3 id="constants-and-environment-variable-names">Constants and Environment Variable Names</h3>
 <p>All caps, separated with underscores, declared at the top of the file/function.</p>
 <p>Constants and anything exported to the environment should be
-capitalized. Constants should be anything that is literal,
+capitalized. Constants should be anything that is a literal,
 that said, PROGRAM_NAME is an exception.</p>
-<pre><code class="language-bash"># Constant
+<pre><code class="language-bash"># constant
 readonly PATH_TO_FILES='/some/path'
 
-# Both constant and environment
+# both constant and environment
 declare -xr ORACLE_SID='PROD'
 
 # variable is assigned from literal string
 readonly PROGRAM_NAME=&quot;pathjoin&quot;
 
-# same variable but assigned value based on another variable's input
-# will still be capitalized
+# Same variable but assigned value based on another variable's input will still
+# be capitalized.
 readonly PROGRAM_NAME=&quot;$(basename &quot;$0&quot;)&quot;
 </code></pre>
 <p><a id="s8.4-source-filenames"></a></p>
@@ -1253,7 +1253,7 @@ fi
 checking of the return code from all parts of a pipe. If it's only
 necessary to check success or failure of the whole pipe, then the
 following is acceptable:</p>
-<pre><code class="language-bash">tar -cf - ./* | ( cd &quot;${dir}&quot; &amp;&amp; tar -xf - )
+<pre><code class="language-bash">tar -cf - ${PWD}/* | ( cd &quot;${dir}&quot; &amp;&amp; tar -xf - )
 if (( PIPESTATUS[0] != 0 || PIPESTATUS[1] != 0 )); then
     echo &quot;Unable to tar files to ${dir}&quot; &gt;&amp;2
 fi
@@ -1264,7 +1264,7 @@ on where it happened in the pipe, you'll need to assign
 <code>PIPESTATUS</code> to another variable immediately after running
 the command (don't forget that <code>[</code> is a command and will
 wipe out <code>PIPESTATUS</code>).</p>
-<pre><code class="language-bash">tar -cf - ./* | ( cd &quot;${DIR}&quot; &amp;&amp; tar -xf - )
+<pre><code class="language-bash">tar -cf - ${PWD}/* | ( cd &quot;${DIR}&quot; &amp;&amp; tar -xf - )
 return_codes=( &quot;${PIPESTATUS[@]}&quot; )
 if (( return_codes[0] != 0 )); then
     do_something
@@ -1280,7 +1280,7 @@ separate process, choose the builtin.</p>
 <p>That is, if the builtin is a generic shell builtin. As stated before,
 shell code should be generic where possible. A separate process may
 be necessary.</p>
-<p>We prefer the use of builtins such as the <em>Parameter Expansion</em>
+<p>Google/I prefer the use of builtins such as the <em>Parameter Expansion</em>
 functions in <code>bash(1)</code> as it's more robust and portable
 (especially when compared to things like <code>sed</code>).</p>
 <p>Examples:</p>
@@ -1301,11 +1301,11 @@ do for said command if they are unfamiliar with the option(s).</p>
 <p>Examples:</p>
 <pre><code class="language-bash"># Do this:
 mkdir --parents &quot;${HOME}&quot;
-ln --symbolic --force &quot;${target}&quot; &quot;./${link_name}&quot;
+ln --symbolic --force &quot;${target}&quot; &quot;${PWD}/${link_name}&quot;
 </code></pre>
 <pre><code class="language-bash"># Don't do this:
 mkdir -p &quot;${HOME}&quot;
-ln -sf &quot;${target}&quot; &quot;./${link_name}&quot;
+ln -sf &quot;${target}&quot; &quot;${PWD}/${link_name}&quot;
 </code></pre>
 <p><a id="s9.4-dependency-checking"></a></p>
 <h3 id="dependency-checking">Dependency Checking</h3>
