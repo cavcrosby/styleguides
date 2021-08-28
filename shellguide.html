@@ -164,7 +164,7 @@
 </tr>
 <tr>
 <td><a href="#s5-task-tags">Comment Tags</a></td>
-<td><a href="#s5.1-todo-tags">TODO Tags</a> - <a href="#s5.2-discuss-tags">DISCUSS Tags</a></td>
+<td><a href="#s5.1-todo-tags">TODO Tags</a> - <a href="#s5.2-discuss-tags">DISCUSS Tags</a> - <a href="#s5.3-monitor-tags">MONITOR Tags</a></td>
 </tr>
 <tr>
 <td><a href="#s6-formatting">Formatting</a></td>
@@ -436,10 +436,20 @@ fix the problem. At least not immediately.</p>
 to be thought out/researched before implementation or there may be code
 that needs to be discussed in about its implementation. Typically these
 are areas that have greater impact than TODO comments because they could 
-affect multiple repos.</p>
+affect numerous areas of code.</p>
 <p>Examples:</p>
 <pre><code class="language-bash"># DISCUSS(cavcrosby): the variable names throughout are clunky. Could this be improved
 # aboard? Can there at least be consistency in this repo?
+</code></pre>
+<p><a id="s5.3-monitor-tags"></a></p>
+<h3 id="monitor-tags">MONITOR Tags</h3>
+<p><code>MONITOR</code> tags/comments are reversed for areas in code that could potentially
+be a workaround due to existing limitation or has some undesired side effect(s).
+If a known issue/side effect, then a link to a bug tracker would help.</p>
+<p>Examples:</p>
+<pre><code class="language-bash"># MONITOR(cavcrosby): while the below works, it appears to generate 'BUG' warnings, this appears to
+# be an issue with stow. Will probably want to monitor the following ticket: 
+# https://github.com/aspiers/stow/issues/65
 </code></pre>
 <p><a id="s6-formatting"></a></p>
 <h2 id="formatting">Formatting</h2>
