@@ -11,7 +11,7 @@ Section                                                                         
 [Comment Tags](#s5-task-tags)                                                     | [TODO Tags](#s5.1-todo-tags) - [DISCUSS Tags](#s5.2-discuss-tags) - [MONITOR Tags](#s5.3-monitor-tags)
 [Formatting](#s6-formatting)                                                         | [Indentation](#s6.1-indentation) - [Line Length and Long Strings](#s6.2-line-length-and-long-strings) - [Pipelines](#s6.3-pipelines) - [Loops](#s6.4-loops) - [Case statement](#s6.5-case-statement) - [Variable expansion](#s6.6-variable-expansion) - [Quoting](#s6.7-quoting) - [CLI](#s6.8-cli)
 [Features and Bugs](#s7-features-and-bugs)                                           |    [ShellCheck](#s7.1-shellcheck) - [Command Substitution](#s7.2-command-substitution) - [Test, [… ], and [[… ]]](#s7.3-tests) - [Testing Strings](#s7.4-testing-strings) - [Wildcard Expansion of Filenames](#s7.5-wildcard-expansion-of-filenames) - [Eval](#s7.6-eval) - [Arrays](#s7.7-arrays) - [Pipes to While](#s7.8-pipes-to-while) - [Arithmetic](#s7.9-arithmetic)
-[Naming Conventions](#s8-naming-conventions)                                         | [Function Names](#s8.1-function-names) - [Variable Names](#s8.2-variable-names) - [Constants and Environment Variable Names](#s8.3-constants-and-environment-variable-names) - [Source Filenames](#s8.4-source-filenames) - [Read-only Variables](#s8.5-read-only-variables) - [Use Local Variables](#s8.6-use-local-variables) - [Function Location](#s8.7-function-location) - [main](#s8.8-main)
+[Naming Conventions](#s8-naming-conventions)                                         | [Function Names](#s8.1-function-names) - [Variable Names](#s8.2-variable-names) - [Constants and Environment Variable Names](#s8.3-constants-and-environment-variable-names) - [Source Filenames](#s8.4-source-filenames) - [Read-only Variables](#s8.5-read-only-variables) - [Use Local Variables](#s8.6-use-local-variables) - [Function Location](#s8.7-function-location) - [Sourcing Location](#s8.8-sourcing-location) - [main](#s8.9-main)
 [Calling Commands](#s9-calling-commands)                                             | [Checking Return Values](#s9.1-checking-return-values) - [Builtin Commands vs. External Commands](#s9.2-builtin-commands-vs-external-commands) - [Long Options Over Short Options](#s9.3-long-options-over-short-options) - [Dependency Checking](#s9.4-dependency-checking)
 [Conclusion](#s10-conclusion)                                                        |
 
@@ -1322,7 +1322,26 @@ If I got functions, put them all together near the top of the
 file. Only sourcing other files, `set` statements and setting constants
 may be done before declaring functions.
 
-<a id="s8.8-main"></a>
+<a id="s8.8-sourcing-location"></a>
+
+### Sourcing Location
+
+*Use `.` to source additional files, not bash's `source` builtin.*
+
+Sourcing additional files should be done between `set` statements and
+constants. This mimics the idea in Python's PEP8 about importing additional
+Python code, in that, imports should be at the top of a file and before
+[constants](https://peps.python.org/pep-0008/#imports).
+
+That said, some packages' shell scripts do follow a different sourcing pattern
+depending on the context of the script. Thus, in the following instances, this
+rule does not need to be fully followed:
+
+*   SysVinit Scripts
+    *   LSB init-functions are typically sourced after defining constants. This may
+        include configurations from a file in the /etc/default directory as well.
+
+<a id="s8.9-main"></a>
 
 ### main
 
