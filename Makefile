@@ -1,9 +1,6 @@
-# special makefile variables
-.DEFAULT_GOAL := help
-.RECIPEPREFIX := >
+include base.mk
 
 # recursive variables
-SHELL = /usr/bin/sh
 SITE_DIR_PATH = ./site
 
 # executables
@@ -12,11 +9,8 @@ executables = \
 	${MKDOCS}\
 
 # targets
-HELP = help
 BUILD = build
 TEST = test
-DEPLOY = deploy
-CLEAN = clean
 
 # simply expanded variables
 _check_executables := $(foreach e,${executables},$(if $(shell command -v ${e}),pass,$(error "No ${e} in PATH")))
