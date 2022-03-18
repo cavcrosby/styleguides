@@ -29,13 +29,13 @@ message =
 .PHONY: ${HELP}
 ${HELP}:
 	# inspired by the makefiles of the Linux kernel and Mercurial
->	@echo 'Available make targets:'
+>	@echo 'Common make targets:'
 >	@echo '  ${BUILD}        - creates the project site into a directory called'
 >	@echo '                 "${SITE_DIR}"'
 >	@echo '  ${TEST}         - launches a web server with the project site'
 >	@echo '  ${DEPLOY}       - deploys the project site to a GitHub Pages branch'
->	@echo '  ${CLEAN}        - remove files created by other targets'
->	@echo 'Public make configurations (e.g. make [config]=1 [targets]):'
+>	@echo '  ${CLEAN}        - remove files created by targets'
+>	@echo 'Common make configurations (e.g. make [config]=1 [targets]):'
 >	@echo '  message      - commit message to use when deploying to a GitHub'
 >	@echo '                 Pages branch'
 
