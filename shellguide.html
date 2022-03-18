@@ -176,7 +176,7 @@
 </tr>
 <tr>
 <td><a href="#s8-naming-conventions">Naming Conventions</a></td>
-<td><a href="#s8.1-function-names">Function Names</a> - <a href="#s8.2-variable-names">Variable Names</a> - <a href="#s8.3-constants-and-environment-variable-names">Constants and Environment Variable Names</a> - <a href="#s8.4-source-filenames">Source Filenames</a> - <a href="#s8.5-read-only-variables">Read-only Variables</a> - <a href="#s8.6-use-local-variables">Use Local Variables</a> - <a href="#s8.7-function-location">Function Location</a> - <a href="#s8.8-main">main</a></td>
+<td><a href="#s8.1-function-names">Function Names</a> - <a href="#s8.2-variable-names">Variable Names</a> - <a href="#s8.3-constants-and-environment-variable-names">Constants and Environment Variable Names</a> - <a href="#s8.4-source-filenames">Source Filenames</a> - <a href="#s8.5-read-only-variables">Read-only Variables</a> - <a href="#s8.6-use-local-variables">Use Local Variables</a> - <a href="#s8.7-function-location">Function Location</a> - <a href="#s8.8-sourcing-location">Sourcing Location</a> - <a href="#s8.9-main">main</a></td>
 </tr>
 <tr>
 <td><a href="#s9-calling-commands">Calling Commands</a></td>
@@ -1223,7 +1223,24 @@ and results in nasty surprises when debugging.</p>
 <p>If I got functions, put them all together near the top of the
 file. Only sourcing other files, <code>set</code> statements and setting constants
 may be done before declaring functions.</p>
-<p><a id="s8.8-main"></a></p>
+<p><a id="s8.8-sourcing-location"></a></p>
+<h3 id="sourcing-location">Sourcing Location</h3>
+<p><em>Use <code>.</code> to source additional files, not bash's <code>source</code> builtin.</em></p>
+<p>Sourcing additional files should be done between <code>set</code> statements and
+constants. This mimics the idea in Python's PEP8 about importing additional
+Python code, in that, imports should be at the top of a file and before
+<a href="https://peps.python.org/pep-0008/#imports">constants</a>.</p>
+<p>That said, some packages' shell scripts do follow a different sourcing pattern
+depending on the context of the script. Thus, in the following instances, this
+rule does not need to be fully followed:</p>
+<ul>
+<li>SysVinit Scripts<ul>
+<li>LSB init-functions are typically sourced after defining constants. This may
+    include configurations from a file in the /etc/default directory as well.</li>
+</ul>
+</li>
+</ul>
+<p><a id="s8.9-main"></a></p>
 <h3 id="main">main</h3>
 <p>A function called <code>main</code> is required for scripts long enough
 to contain at least one other function.</p>
