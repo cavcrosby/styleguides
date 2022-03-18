@@ -4,7 +4,7 @@
 
 # recursive variables
 SHELL = /usr/bin/sh
-SITE_DIR = site
+SITE_DIR_PATH = ./site
 
 # executables
 MKDOCS = mkdocs
@@ -18,30 +18,27 @@ TEST = test
 DEPLOY = deploy
 CLEAN = clean
 
-# inspired from:
-# https://stackoverflow.com/questions/5618615/check-if-a-program-exists-from-a-makefile#answer-25668869
+# simply expanded variables
 _check_executables := $(foreach e,${executables},$(if $(shell command -v ${e}),pass,$(error "No ${e} in PATH")))
 
-# May need to be passed in as a var at make runtime (e.g. make FOO=1),
-# depending on the target.
-message =
+# to be (or can be) passed in at make runtime
+COMMIT_MESSAGE =
 
 .PHONY: ${HELP}
 ${HELP}:
 	# inspired by the makefiles of the Linux kernel and Mercurial
 >	@echo 'Common make targets:'
->	@echo '  ${BUILD}        - creates the project site into a directory called'
->	@echo '                 "${SITE_DIR}"'
+>	@echo '  ${BUILD}        - creates the project site into a directory'
 >	@echo '  ${TEST}         - launches a web server with the project site'
 >	@echo '  ${DEPLOY}       - deploys the project site to a GitHub Pages branch'
 >	@echo '  ${CLEAN}        - remove files created by targets'
 >	@echo 'Common make configurations (e.g. make [config]=1 [targets]):'
->	@echo '  message      - commit message to use when deploying to a GitHub'
->	@echo '                 Pages branch'
+>	@echo '  COMMIT_MESSAGE      - commit message to use when deploying to a GitHub'
+>	@echo '                        Pages branch'
 
 .PHONY: ${BUILD}
 ${BUILD}:
->	${MKDOCS} build --clean --site-dir "${SITE_DIR}"
+>	${MKDOCS} build --clean --site-dir "${SITE_DIR_PATH}"
 
 .PHONY: ${TEST}
 ${TEST}:
@@ -49,9 +46,9 @@ ${TEST}:
 
 .PHONY: ${DEPLOY}
 ${DEPLOY}:
->	@[ -n "${message}" ] || { echo "'message' was not passed into make"; exit 1; }
->	${MKDOCS} gh-deploy --message "${message}"
+>	@[ -n "${COMMIT_MESSAGE}" ] || { echo "make: 'COMMIT_MESSAGE' was not passed into make"; exit 1; }
+>	${MKDOCS} gh-deploy --message "${COMMIT_MESSAGE}"
 
 .PHONY: ${CLEAN}
 ${CLEAN}:
->	rm --recursive --force "${SITE_DIR}"
+>	rm --recursive --force "${SITE_DIR_PATH}"
