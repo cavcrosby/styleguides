@@ -463,14 +463,11 @@ for files that are own by me.</p>
 four spaces.</p>
 <p><a id="s6.2-line-length-and-long-strings"></a></p>
 <h3 id="line-length-and-long-strings">Line Length and Long Strings</h3>
-<p>Maximum line length is 70ish characters (Google states their strings stop
-at 80 max). This is to stay consistent with Python code (PEP 8 compliant
-anyways) I write.</p>
-<p>If I have to write strings that are a lot longer than 70ish characters, this
-should be done with a here document or an embedded newline if possible.
-Literal strings that have to be a lot longer than 70ish characters and
-can't sensibly be split are ok, but it's strongly preferred to find a
-way to make it shorter.</p>
+<p>Maximum line length is 80 characters.</p>
+<p>If I have to write strings that are longer than 80 characters, then this should
+be done with a here document or an embedded newline if possible. Literal strings
+that have to be longer than 80 characters and can't sensibly be split are ok,
+but it's strongly preferred to find a way to make it shorter.</p>
 <pre><code class="language-bash"># DO use 'here document's
 cat &lt;&lt;END
 I am an exceptionally long
