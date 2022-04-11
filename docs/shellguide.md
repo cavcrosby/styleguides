@@ -368,15 +368,12 @@ four spaces.
 
 ### Line Length and Long Strings
 
-Maximum line length is 70ish characters (Google states their strings stop
-at 80 max). This is to stay consistent with Python code (PEP 8 compliant
-anyways) I write.
+Maximum line length is 80 characters.
 
-If I have to write strings that are a lot longer than 70ish characters, this
-should be done with a here document or an embedded newline if possible.
-Literal strings that have to be a lot longer than 70ish characters and
-can't sensibly be split are ok, but it's strongly preferred to find a
-way to make it shorter.
+If I have to write strings that are longer than 80 characters, then this should
+be done with a here document or an embedded newline if possible. Literal strings
+that have to be longer than 80 characters and can't sensibly be split are ok,
+but it's strongly preferred to find a way to make it shorter.
 
 ```bash
 # DO use 'here document's
