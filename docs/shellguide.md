@@ -1175,8 +1175,8 @@ function my_func() {
 ### Variable Names
 
 A lot of variables I use are to denote file/directory names. So it can
-be assumed that variables denoting a dir or file in its name will be the
-actual name of the dir or file.
+be assumed that variables denoting a directory or file in its name will be the
+actual name of the directory or file.
 
 Anything else can also be assumed to be the name of some 'object' (OOP is not
 a feature in POSIX shell). Any other characteristic that a variable is
