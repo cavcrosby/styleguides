@@ -8,7 +8,7 @@ Section                                                                         
 [Shell Files and Interpreter Invocation](#s2-shell-files-and-interpreter-invocation) | [File Extensions](#s2.1-file-extensions) - [SUID/SGID](#s2.2-suid-sgid)
 [Environment](#s3-environment)                                                       | [STDOUT vs STDERR](#s3.1-stdout-vs-stderr)
 [Comments](#s4-comments)                                                             | [File Header](#s4.1-file-header) - [Function Comments](#s4.2-function-comments) - [Implementation Comments](#s4.3-implementation-comments)
-[Comment Tags](#s5-task-tags)                                                     | [TODO Tags](#s5.1-todo-tags) - [DISCUSS Tags](#s5.2-discuss-tags) - [MONITOR Tags](#s5.3-monitor-tags)
+[Comment Tags](#s5-task-tags)                                                     | [TODO Tags](#s5.1-todo-tags) - [MONITOR Tags](#s5.2-monitor-tags)
 [Formatting](#s6-formatting)                                                         | [Indentation](#s6.1-indentation) - [Line Length and Long Strings](#s6.2-line-length-and-long-strings) - [Pipelines](#s6.3-pipelines) - [Loops](#s6.4-loops) - [Case statement](#s6.5-case-statement) - [Variable expansion](#s6.6-variable-expansion) - [Quoting](#s6.7-quoting) - [CLI](#s6.8-cli)
 [Features and Bugs](#s7-features-and-bugs)                                           |    [ShellCheck](#s7.1-shellcheck) - [Command Substitution](#s7.2-command-substitution) - [Test, [… ], and [[… ]]](#s7.3-tests) - [Testing Strings](#s7.4-testing-strings) - [Wildcard Expansion of Filenames](#s7.5-wildcard-expansion-of-filenames) - [Eval](#s7.6-eval) - [Arrays](#s7.7-arrays) - [Pipes to While](#s7.8-pipes-to-while) - [Arithmetic](#s7.9-arithmetic)
 [Naming Conventions](#s8-naming-conventions)                                         | [Function Names](#s8.1-function-names) - [Variable Names](#s8.2-variable-names) - [Constants and Environment Variable Names](#s8.3-constants-and-environment-variable-names) - [Source Filenames](#s8.4-source-filenames) - [Read-only Variables](#s8.5-read-only-variables) - [Use Local Variables](#s8.6-use-local-variables) - [Function Location](#s8.7-function-location) - [Sourcing Location](#s8.8-sourcing-location) - [main](#s8.9-main)
@@ -314,24 +314,7 @@ Examples:
 # TODO(cavcrosby): need to implement new option to allow easier convenience
 ```
 
-<a id="s5.2-discuss-tags"></a>
-
-### DISCUSS Tags
-
-`DISCUSS` tags/comments are reversed for areas in code that still need
-to be thought out/researched before implementation or there may be code
-that needs to be discussed in about its implementation. Typically these
-are areas that have greater impact than TODO comments because they could 
-affect numerous areas of code.
-
-Examples:
-
-```bash
-# DISCUSS(cavcrosby): the variable names throughout are clunky. Could this be improved
-# aboard? Can there at least be consistency in this repo?
-```
-
-<a id="s5.3-monitor-tags"></a>
+<a id="s5.2-monitor-tags"></a>
 
 ### MONITOR Tags
 
